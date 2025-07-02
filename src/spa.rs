@@ -1,6 +1,7 @@
 
 /// Enumeration for function codes to select desired final outputs from SPA
-enum Output{
+#[derive(PartialEq)]
+pub enum Output{
     /// calculate zenith and azimuth
     SpaZa,
     /// calculate zenith, azimuth, and incidence
@@ -11,21 +12,21 @@ enum Output{
     SpaAll,
 }
 
-struct SpaData {
+pub struct SpaData {
     //----------------------INPUT VALUES------------------------
 
     /// 4-digit year,      valid range: -2000 to 6000, error code: 1
-    year: i64,
+    pub year: i64,
     /// 2-digit month,         valid range: 1 to  12,  error code: 2
-    month: i64,
+    pub month: i64,
     /// 2-digit day,           valid range: 1 to  31,  error code: 3
-    day: i64,
+    pub day: i64,
     /// Observer local hour,   valid range: 0 to  24,  error code: 4
-    hour: i64,
+    pub hour: i64,
     /// Observer local minute, valid range: 0 to  59,  error code: 5
-    minute: i64,
+    pub minute: i64,
     /// Observer local second, valid range: 0 to <60,  error code: 6
-    second: f64,
+    pub second: f64,
 
     /// Fractional second difference between UTC and UT which is used
     /// to adjust UTC for earth's irregular rotation rate and is derived
@@ -34,7 +35,7 @@ struct SpaData {
     /// where delta_ut1 = DUT1
     /// 
     /// valid range: -1 to 1 second (exclusive), error code 17
-    delta_ut1: f64,
+    pub delta_ut1: f64,
 
     /// Difference between earth rotation time and terrestrial time
     /// It is derived from observation only and is reported in this
@@ -42,56 +43,56 @@ struct SpaData {
     /// where delta_t = 32.184 + (TAI-UTC) - DUT1
     /// 
     /// valid range: -8000 to 8000 seconds, error code: 7
-    delta_t: f64,
+    pub delta_t: f64,
 
     /// Observer time zone (negative west of Greenwich)
     /// 
     /// valid range: -18   to   18 hours,   error code: 8
-    timezone: f64,
+    pub timezone: f64,
 
     /// Observer longitude (negative west of Greenwich)
     /// 
     /// valid range: -180  to  180 degrees, error code: 9
-    longitude: f64,
+    pub longitude: f64,
 
     /// Observer latitude (negative south of equator)
     /// 
     /// valid range: -90   to   90 degrees, error code: 10
-    latitude: f64,
+    pub latitude: f64,
 
     /// Observer elevation [meters]
     /// 
     /// valid range: -6500000 or higher meters,    error code: 11
-    elevation: f64,
+    pub elevation: f64,
 
     /// Annual average local pressure [millibars]
     /// 
     /// valid range:    0 to 5000 millibars,       error code: 12
-    pressure: f64,
+    pub pressure: f64,
 
     /// Annual average local temperature [degrees Celsius]
     /// 
     /// valid range: -273 to 6000 degrees Celsius, error code; 13
-    temperature: f64,
+    pub temperature: f64,
 
     /// Surface slope (measured from the horizontal plane)
     /// 
     /// valid range: -360 to 360 degrees, error code: 14
-    slope: f64,
+    pub slope: f64,
 
     /// Surface azimuth rotation (measured from south to projection of
     /// surface normal on horizontal plane, negative east)
     /// 
     /// valid range: -360 to 360 degrees, error code: 15
-    azm_rotation: f64,
+    pub azm_rotation: f64,
 
     /// Atmospheric refraction at sunrise and sunset (0.5667 deg is typical)
     /// 
     /// valid range: -5   to   5 degrees, error code: 16
-    atmos_refract: f64,
+    pub atmos_refract: f64,
 
     /// Switch to choose functions for desired output (from enumeration)
-    function: Output,
+    pub function: Output,
 
     //-----------------Intermediate OUTPUT VALUES--------------------
 

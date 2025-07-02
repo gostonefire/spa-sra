@@ -2,7 +2,7 @@
 
 use crate::constants::{B_COUNT, B_MAX_SUBCOUNT, L_COUNT, L_MAX_SUBCOUNT, R_COUNT, R_MAX_SUBCOUNT, TERM_COUNT};
 
-const L_TERMS: [[[f64;TERM_COUNT];L_MAX_SUBCOUNT];L_COUNT] = [
+pub const L_TERMS: [[[f64;TERM_COUNT];L_MAX_SUBCOUNT];L_COUNT] = [
     [
         [175347046.0,0.0,0.0],
         [3341656.0,4.6692568,6283.07585],
@@ -401,7 +401,7 @@ const L_TERMS: [[[f64;TERM_COUNT];L_MAX_SUBCOUNT];L_COUNT] = [
     ]
 ];
 
-const B_TERMS: [[[f64;TERM_COUNT];B_MAX_SUBCOUNT];B_COUNT] = [
+pub const B_TERMS: [[[f64;TERM_COUNT];B_MAX_SUBCOUNT];B_COUNT] = [
     [
         [280.0,3.199,84334.662],
         [102.0,5.422,5507.553],
@@ -418,7 +418,7 @@ const B_TERMS: [[[f64;TERM_COUNT];B_MAX_SUBCOUNT];B_COUNT] = [
     ]
 ];
 
-const R_TERMS: [[[f64;TERM_COUNT];R_MAX_SUBCOUNT];R_COUNT] = [
+pub const R_TERMS: [[[f64;TERM_COUNT];R_MAX_SUBCOUNT];R_COUNT] = [
     [
         [100013989.0,0.0,0.0],
         [1670700.0,3.0984635,6283.07585],

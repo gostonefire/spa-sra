@@ -2,7 +2,7 @@
 
 use crate::constants::{TERM_PE_COUNT, TERM_Y_COUNT, Y_COUNT};
 
-const Y_TERMS: [[i64;TERM_Y_COUNT];Y_COUNT] = [
+pub const Y_TERMS: [[i64;TERM_Y_COUNT];Y_COUNT] = [
     [0,0,0,0,1],
     [-2,0,0,2,2],
     [0,0,0,2,2],
@@ -68,7 +68,7 @@ const Y_TERMS: [[i64;TERM_Y_COUNT];Y_COUNT] = [
     [2,-1,0,2,2],
 ];
 
-const PE_TERMS: [[f64;TERM_PE_COUNT];Y_COUNT] = [
+pub const PE_TERMS: [[f64;TERM_PE_COUNT];Y_COUNT] = [
     [-171996.0,-174.2,92025.0,8.9],
     [-13187.0,-1.6,5736.0,-3.1],
     [-2274.0,-0.2,977.0,-0.5],

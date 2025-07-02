@@ -40,6 +40,9 @@ pub const SUN_COUNT: usize = 3;
 
 pub const TERM_Y_COUNT: usize = TERM_X_COUNT;
 
+pub const l_subcount: [i64;L_COUNT] = [64,34,20,7,3,1];
+pub const b_subcount: [i64;B_COUNT] = [5,2];
+pub const r_subcount: [i64;R_COUNT] = [40,10,6,2,1];
 
 /*
 
