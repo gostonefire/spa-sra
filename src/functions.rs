@@ -1,4 +1,4 @@
-use crate::constants::{b_subcount, l_subcount, r_subcount, B_COUNT, L_COUNT, PI, R_COUNT, TERM_A, TERM_B, TERM_C, TERM_COUNT, TERM_EPS_C, TERM_EPS_D, TERM_PSI_A, TERM_PSI_B, TERM_Y_COUNT, Y_COUNT};
+use crate::constants::{b_subcount, l_subcount, r_subcount, B_COUNT, JD_MINUS, JD_PLUS, JD_ZERO, L_COUNT, PI, R_COUNT, SUN_RADIUS, SUN_RISE, SUN_SET, SUN_TRANSIT, TERM_A, TERM_B, TERM_C, TERM_COUNT, TERM_EPS_C, TERM_EPS_D, TERM_PSI_A, TERM_PSI_B, TERM_Y_COUNT, Y_COUNT};
 use crate::earth_periodic_terms::{B_TERMS, L_TERMS, R_TERMS};
 use crate::nutation_obliquity_periodic_terms::{PE_TERMS, Y_TERMS};
 use crate::spa::{Output, SpaData};
@@ -304,158 +304,141 @@ fn sun_equatorial_horizontal_parallax(r: f64) -> f64 {
     8.794 / (3600.0 * r)
 }
 
+fn right_ascension_parallax_and_topocentric_dec(latitude: f64, elevation: f64, xi: f64, h: f64, delta: f64, delta_alpha: &mut f64, delta_prime: &mut f64) {
+    let lat_rad: f64   = deg2rad(latitude);
+    let xi_rad: f64    = deg2rad(xi);
+    let h_rad: f64     = deg2rad(h);
+    let delta_rad: f64 = deg2rad(delta);
+    let u: f64 = (0.99664719 * lat_rad.tan()).atan();
+    let y: f64 = 0.99664719 * u.sin() + elevation * lat_rad.sin() / 6378140.0;
+    let x: f64 =              u.cos() + elevation * lat_rad.cos() / 6378140.0;
 
-/*
-void right_ascension_parallax_and_topocentric_dec(double latitude, double elevation,
-	       double xi, double h, double delta, double *delta_alpha, double *delta_prime)
-{
-    double delta_alpha_rad;
-    double lat_rad   = deg2rad(latitude);
-    double xi_rad    = deg2rad(xi);
-    double h_rad     = deg2rad(h);
-    double delta_rad = deg2rad(delta);
-    double u = atan(0.99664719 * tan(lat_rad));
-    double y = 0.99664719 * sin(u) + elevation*sin(lat_rad)/6378140.0;
-    double x =              cos(u) + elevation*cos(lat_rad)/6378140.0;
+    let delta_alpha_rad: f64 = (             - x * xi_rad.sin()  * h_rad.sin())
+        .atan2(        delta_rad.cos() - x * xi_rad.sin()  * h_rad.cos());
 
-    delta_alpha_rad =      atan2(                - x*sin(xi_rad) *sin(h_rad),
-                                  cos(delta_rad) - x*sin(xi_rad) *cos(h_rad));
-
-    *delta_prime = rad2deg(atan2((sin(delta_rad) - y*sin(xi_rad))*cos(delta_alpha_rad),
-                                  cos(delta_rad) - x*sin(xi_rad) *cos(h_rad)));
+    *delta_prime = rad2deg(((delta_rad.sin() - y * xi_rad.sin()) * delta_alpha_rad.cos())
+        .atan2(        delta_rad.cos() - x * xi_rad.sin()  * h_rad.cos()));
 
     *delta_alpha = rad2deg(delta_alpha_rad);
 }
 
-double topocentric_right_ascension(double alpha_deg, double delta_alpha)
-{
-    return alpha_deg + delta_alpha;
+fn topocentric_right_ascension(alpha_deg: f64, delta_alpha: f64) -> f64 {
+    alpha_deg + delta_alpha
 }
 
-double topocentric_local_hour_angle(double h, double delta_alpha)
-{
-    return h - delta_alpha;
+fn topocentric_local_hour_angle(h: f64, delta_alpha: f64) -> f64 {
+    h - delta_alpha
 }
 
-double topocentric_elevation_angle(double latitude, double delta_prime, double h_prime)
-{
-    double lat_rad         = deg2rad(latitude);
-    double delta_prime_rad = deg2rad(delta_prime);
+fn topocentric_elevation_angle(latitude: f64, delta_prime: f64, h_prime: f64) -> f64 {
+    let lat_rad: f64         = deg2rad(latitude);
+    let delta_prime_rad: f64 = deg2rad(delta_prime);
 
-    return rad2deg(asin(sin(lat_rad)*sin(delta_prime_rad) +
-                        cos(lat_rad)*cos(delta_prime_rad) * cos(deg2rad(h_prime))));
+    rad2deg((lat_rad.sin() * delta_prime_rad.sin() + 
+             lat_rad.cos() * delta_prime_rad.cos() * deg2rad(h_prime).cos()).asin())
 }
 
-double atmospheric_refraction_correction(double pressure, double temperature,
-	                                     double atmos_refract, double e0)
-{
-    double del_e = 0;
+fn atmospheric_refraction_correction(pressure: f64, temperature: f64, atmos_refract: f64, e0: f64) -> f64 {
+    let mut del_e: f64 = 0.0;
 
-    if (e0 >= -1*(SUN_RADIUS + atmos_refract))
-        del_e = (pressure / 1010.0) * (283.0 / (273.0 + temperature)) *
-                 1.02 / (60.0 * tan(deg2rad(e0 + 10.3/(e0 + 5.11))));
+    if e0 >= -1.0 * (SUN_RADIUS + atmos_refract) {
+        del_e = (pressure / 1010.0) * (283.0 / (273.0 + temperature)) * 
+            1.02 / (60.0 * deg2rad(e0 + 10.3/(e0 + 5.11)).tan());
+    }
 
-    return del_e;
+    del_e
 }
 
-double topocentric_elevation_angle_corrected(double e0, double delta_e)
-{
-    return e0 + delta_e;
+fn topocentric_elevation_angle_corrected(e0: f64, delta_e: f64) -> f64 {
+    e0 + delta_e
 }
 
-double topocentric_zenith_angle(double e)
-{
-    return 90.0 - e;
+fn topocentric_zenith_angle(e: f64) -> f64 {
+    90.0 - e
 }
 
-double topocentric_azimuth_angle_astro(double h_prime, double latitude, double delta_prime)
-{
-    double h_prime_rad = deg2rad(h_prime);
-    double lat_rad     = deg2rad(latitude);
+fn topocentric_azimuth_angle_astro(h_prime: f64, latitude: f64, delta_prime: f64) -> f64 {
+    let h_prime_rad: f64 = deg2rad(h_prime);
+    let lat_rad: f64     = deg2rad(latitude);
 
-    return limit_degrees(rad2deg(atan2(sin(h_prime_rad),
-                         cos(h_prime_rad)*sin(lat_rad) - tan(deg2rad(delta_prime))*cos(lat_rad))));
+    limit_degrees(rad2deg(h_prime_rad.sin().atan2(h_prime_rad.cos() * lat_rad.sin() - deg2rad(delta_prime).tan() * lat_rad.cos())))
 }
 
-double topocentric_azimuth_angle(double azimuth_astro)
-{
-    return limit_degrees(azimuth_astro + 180.0);
+fn topocentric_azimuth_angle(azimuth_astro: f64) -> f64 {
+    limit_degrees(azimuth_astro + 180.0)
 }
 
-double surface_incidence_angle(double zenith, double azimuth_astro, double azm_rotation,
-	                                                                double slope)
-{
-    double zenith_rad = deg2rad(zenith);
-    double slope_rad  = deg2rad(slope);
+fn surface_incidence_angle(zenith: f64, azimuth_astro: f64, azm_rotation: f64, slope: f64) -> f64 {
+    let zenith_rad: f64 = deg2rad(zenith);
+    let slope_rad: f64  = deg2rad(slope);
 
-    return rad2deg(acos(cos(zenith_rad)*cos(slope_rad)  +
-                        sin(slope_rad )*sin(zenith_rad) * cos(deg2rad(azimuth_astro - azm_rotation))));
+    rad2deg((zenith_rad.cos() * slope_rad.cos()  +
+              slope_rad.sin() * zenith_rad.sin() * deg2rad(azimuth_astro - azm_rotation).cos()).acos())
 }
 
-double sun_mean_longitude(double jme)
-{
-    return limit_degrees(280.4664567 + jme*(360007.6982779 + jme*(0.03032028 +
-                    jme*(1/49931.0   + jme*(-1/15300.0     + jme*(-1/2000000.0))))));
+fn sun_mean_longitude(jme: f64) -> f64 {
+    limit_degrees(280.4664567 + jme * (360007.6982779 + jme * (0.03032028 +
+                 jme * (1.0 / 49931.0 + jme * (-1.0 / 15300.0 + jme * (-1.0 / 2000000.0))))))
 }
 
-double eot(double m, double alpha, double del_psi, double epsilon)
-{
-    return limit_minutes(4.0*(m - 0.0057183 - alpha + del_psi*cos(deg2rad(epsilon))));
+fn eot(m: f64, alpha: f64, del_psi: f64, epsilon: f64) -> f64 {
+    limit_minutes(4.0 * (m - 0.0057183 - alpha + del_psi * deg2rad(epsilon).cos()))
 }
 
-double approx_sun_transit_time(double alpha_zero, double longitude, double nu)
-{
-    return (alpha_zero - longitude - nu) / 360.0;
+fn approx_sun_transit_time(alpha_zero: f64, longitude: f64, nu: f64) -> f64 {
+    (alpha_zero - longitude - nu) / 360.0
 }
 
-double sun_hour_angle_at_rise_set(double latitude, double delta_zero, double h0_prime)
-{
-    double h0             = -99999;
-    double latitude_rad   = deg2rad(latitude);
-    double delta_zero_rad = deg2rad(delta_zero);
-    double argument       = (sin(deg2rad(h0_prime)) - sin(latitude_rad)*sin(delta_zero_rad)) /
-                                                     (cos(latitude_rad)*cos(delta_zero_rad));
+fn sun_hour_angle_at_rise_set(latitude: f64, delta_zero: f64, h0_prime: f64) -> f64 {
+    let mut h0: f64             = -99999.0;
+    let latitude_rad: f64   = deg2rad(latitude);
+    let delta_zero_rad: f64 = deg2rad(delta_zero);
+    let argument: f64       = (deg2rad(h0_prime).sin() - latitude_rad.sin() * delta_zero_rad.sin()) /
+                                                        (latitude_rad.cos() * delta_zero_rad.cos());
 
-    if (fabs(argument) <= 1) h0 = limit_degrees180(rad2deg(acos(argument)));
+    if argument.abs() <= 1.0 {
+        h0 = limit_degrees180(rad2deg(argument.acos()));
+    }
 
-    return h0;
+    h0
 }
 
-void approx_sun_rise_and_set(double *m_rts, double h0)
-{
-    double h0_dfrac = h0/360.0;
+fn approx_sun_rise_and_set(m_rts: &mut [f64], h0: f64) {
+    let h0_dfrac: f64 = h0 / 360.0;
 
     m_rts[SUN_RISE]    = limit_zero2one(m_rts[SUN_TRANSIT] - h0_dfrac);
     m_rts[SUN_SET]     = limit_zero2one(m_rts[SUN_TRANSIT] + h0_dfrac);
     m_rts[SUN_TRANSIT] = limit_zero2one(m_rts[SUN_TRANSIT]);
 }
 
-double rts_alpha_delta_prime(double *ad, double n)
-{
-    double a = ad[JD_ZERO] - ad[JD_MINUS];
-    double b = ad[JD_PLUS] - ad[JD_ZERO];
+fn rts_alpha_delta_prime(ad: &[f64], n: f64) -> f64 {
+    let mut a: f64 = ad[JD_ZERO] - ad[JD_MINUS];
+    let mut b: f64 = ad[JD_PLUS] - ad[JD_ZERO];
 
-    if (fabs(a) >= 2.0) a = limit_zero2one(a);
-    if (fabs(b) >= 2.0) b = limit_zero2one(b);
+    if a.abs() >= 2.0 {
+        a = limit_zero2one(a);
+    }
+    if b.abs() >= 2.0 {
+        b = limit_zero2one(b);
+    }
 
-    return ad[JD_ZERO] + n * (a + b + (b-a)*n)/2.0;
+    ad[JD_ZERO] + n * (a + b + (b - a) * n) / 2.0
 }
 
-double rts_sun_altitude(double latitude, double delta_prime, double h_prime)
-{
-    double latitude_rad    = deg2rad(latitude);
-    double delta_prime_rad = deg2rad(delta_prime);
+fn rts_sun_altitude(latitude: f64, delta_prime: f64, h_prime: f64) -> f64 {
+    let latitude_rad: f64    = deg2rad(latitude);
+    let delta_prime_rad: f64 = deg2rad(delta_prime);
 
-    return rad2deg(asin(sin(latitude_rad)*sin(delta_prime_rad) +
-                        cos(latitude_rad)*cos(delta_prime_rad)*cos(deg2rad(h_prime))));
+    rad2deg((latitude_rad.sin() * delta_prime_rad.sin() +
+             latitude_rad.cos() * delta_prime_rad.cos() * deg2rad(h_prime).cos()).asin())
 }
 
-double sun_rise_and_set(double *m_rts,   double *h_rts,   double *delta_prime, double latitude,
-                        double *h_prime, double h0_prime, int sun)
-{
-    return m_rts[sun] + (h_rts[sun] - h0_prime) /
-          (360.0*cos(deg2rad(delta_prime[sun]))*cos(deg2rad(latitude))*sin(deg2rad(h_prime[sun])));
+fn sun_rise_and_set(m_rts: &[f64], h_rts: &[f64], delta_prime: &[f64], latitude: f64, h_prime: &[f64], h0_prime: f64, sun: usize) -> f64 {
+    m_rts[sun] + (h_rts[sun] - h0_prime) /
+        (360.0 * deg2rad(delta_prime[sun]).cos() * deg2rad(latitude).cos() * deg2rad(h_prime[sun]).sin())
 }
+
+/*
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Calculate required SPA parameters to get the right ascension (alpha) and declination (delta)

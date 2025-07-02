@@ -1,5 +1,5 @@
 pub const PI: f64 = std::f64::consts::PI;   // in original code: 3.1415926535897932384626433832795028841971
-const SUN_RADIUS: f64 = 0.26667;
+pub const SUN_RADIUS: f64 = 0.26667;
 
 pub const L_COUNT: usize = 6;
 pub const B_COUNT: usize = 2;
