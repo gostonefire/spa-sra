@@ -1,4 +1,4 @@
-use crate::constants::{b_subcount, l_subcount, r_subcount, B_COUNT, JD_COUNT, JD_MINUS, JD_PLUS, JD_ZERO, L_COUNT, PI, R_COUNT, SUN_COUNT, SUN_RADIUS, SUN_RISE, SUN_SET, SUN_TRANSIT, TERM_A, TERM_B, TERM_C, TERM_COUNT, TERM_EPS_C, TERM_EPS_D, TERM_PSI_A, TERM_PSI_B, TERM_X0, TERM_X1, TERM_X2, TERM_X3, TERM_X4, TERM_X_COUNT, TERM_Y_COUNT, Y_COUNT};
+use crate::constants::{B_SUBCOUNT, L_SUBCOUNT, R_SUBCOUNT, B_COUNT, JD_COUNT, JD_MINUS, JD_PLUS, JD_ZERO, L_COUNT, PI, R_COUNT, SUN_COUNT, SUN_RADIUS, SUN_RISE, SUN_SET, SUN_TRANSIT, TERM_A, TERM_B, TERM_C, TERM_COUNT, TERM_EPS_C, TERM_EPS_D, TERM_PSI_A, TERM_PSI_B, TERM_X0, TERM_X1, TERM_X2, TERM_X3, TERM_X4, TERM_X_COUNT, TERM_Y_COUNT, Y_COUNT};
 use crate::earth_periodic_terms::{B_TERMS, L_TERMS, R_TERMS};
 use crate::nutation_obliquity_periodic_terms::{PE_TERMS, Y_TERMS};
 use crate::spa::{Output, SpaData};
@@ -171,7 +171,7 @@ fn earth_values(term_sum: &[f64], count: usize, jme: f64) -> f64 {
 fn earth_heliocentric_longitude(jme: f64) -> f64 {
     let mut sum: [f64;L_COUNT] = [0.0; L_COUNT];
     for i in 0..L_COUNT {
-        sum[i] = earth_periodic_term_summation(&L_TERMS[i], l_subcount[i], jme);
+        sum[i] = earth_periodic_term_summation(&L_TERMS[i], L_SUBCOUNT[i], jme);
     }
 
     limit_degrees(rad2deg(earth_values(&sum, L_COUNT, jme)))
@@ -180,7 +180,7 @@ fn earth_heliocentric_longitude(jme: f64) -> f64 {
 fn earth_heliocentric_latitude(jme: f64) -> f64 {
     let mut sum: [f64;B_COUNT] = [0.0; B_COUNT];
     for i in 0..B_COUNT {
-        sum[i] = earth_periodic_term_summation(&B_TERMS[i], b_subcount[i], jme);
+        sum[i] = earth_periodic_term_summation(&B_TERMS[i], B_SUBCOUNT[i], jme);
     }
 
     rad2deg(earth_values(&sum, B_COUNT, jme))
@@ -189,7 +189,7 @@ fn earth_heliocentric_latitude(jme: f64) -> f64 {
 fn earth_radius_vector(jme: f64) -> f64 {
     let mut sum: [f64;R_COUNT] = [0.0; R_COUNT];
     for i in 0..R_COUNT {
-        sum[i] = earth_periodic_term_summation(&R_TERMS[i], r_subcount[i], jme);
+        sum[i] = earth_periodic_term_summation(&R_TERMS[i], R_SUBCOUNT[i], jme);
     }
 
     earth_values(&sum, R_COUNT, jme)
@@ -569,7 +569,7 @@ fn calculate_eot_and_sun_rise_transit_set(spa: &mut SpaData) {
 /// # Arguments
 /// 
 /// * 'spa' - the `SpaData` struct
-fn spa_calculate(spa: &mut SpaData) -> i64 {
+pub fn spa_calculate(spa: &mut SpaData) -> i64 {
     let result: i64 = validate_inputs(spa);
 
     if result == 0 {

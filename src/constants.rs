@@ -1,4 +1,4 @@
-pub const PI: f64 = std::f64::consts::PI;   // in original code: 3.1415926535897932384626433832795028841971
+pub const PI: f64 = std::f64::consts::PI;
 pub const SUN_RADIUS: f64 = 0.26667;
 
 pub const L_COUNT: usize = 6;
@@ -40,17 +40,6 @@ pub const SUN_COUNT: usize = 3;
 
 pub const TERM_Y_COUNT: usize = TERM_X_COUNT;
 
-pub const l_subcount: [i64;L_COUNT] = [64,34,20,7,3,1];
-pub const b_subcount: [i64;B_COUNT] = [5,2];
-pub const r_subcount: [i64;R_COUNT] = [40,10,6,2,1];
-
-/*
-
-enum {TERM_A, TERM_B, TERM_C, TERM_COUNT};
-enum {TERM_X0, TERM_X1, TERM_X2, TERM_X3, TERM_X4, TERM_X_COUNT};
-enum {TERM_PSI_A, TERM_PSI_B, TERM_EPS_C, TERM_EPS_D, TERM_PE_COUNT};
-enum {JD_MINUS, JD_ZERO, JD_PLUS, JD_COUNT};
-enum {SUN_TRANSIT, SUN_RISE, SUN_SET, SUN_COUNT};
-
-#define TERM_Y_COUNT TERM_X_COUNT
- */
+pub const L_SUBCOUNT: [i64;L_COUNT] = [64,34,20,7,3,1];
+pub const B_SUBCOUNT: [i64;B_COUNT] = [5,2];
+pub const R_SUBCOUNT: [i64;R_COUNT] = [40,10,6,2,1];
