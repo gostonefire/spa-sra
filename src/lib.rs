@@ -46,7 +46,7 @@ mod tests {
 
         let result = spa_calc(&mut spa);
         assert_eq!(result, 0, "SPA Error Code: 0");
-        
+
         assert_eq!(format!("{:.6}", spa.jd), "2452930.312847",        "Julian Day:    2452930.312847");
         assert_eq!(format!("{:.6e}", spa.l), "2.401826e1",            "L:             2.401826e+01 degrees");
         assert_eq!(format!("{:.6e}", spa.b), "-1.011219e-4",          "B:             -1.011219e-04 degrees");
@@ -61,12 +61,12 @@ mod tests {
 
         let mut min: f64 = 60.0 * (spa.sunrise - (spa.sunrise as i64) as f64);
         let mut sec: f64 = 60.0 * (min - (min as i64) as f64);
-        assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.sunrise as i64, min as i64, sec as i64), "06:12:43", 
+        assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.sunrise as i64, min as i64, sec as i64), "06:12:43",
                    "Sunrise: 06:12:43 Local Time");
 
         min = 60.0 * (spa.sunset - (spa.sunset as i64) as f64);
         sec = 60.0 * (min - (min as i64) as f64);
-        assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.sunset as i64, min as i64, sec as i64), "17:20:19", 
+        assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.sunset as i64, min as i64, sec as i64), "17:20:19",
                    "Sunset: 17:20:19 Local Time");
     }
 }
