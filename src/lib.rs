@@ -5,7 +5,7 @@ mod earth_periodic_terms;
 mod constants;
 mod nutation_obliquity_periodic_terms;
 mod functions;
-mod spa;
+pub mod spa;
 
 pub fn spa_calc(spa: &mut SpaData) -> i64  {
     spa_calculate(spa)
