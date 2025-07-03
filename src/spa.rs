@@ -148,14 +148,14 @@ pub struct SpaData {
 
     //---------------------Final OUTPUT VALUES------------------------
 
-    pub(crate) zenith: f64,         //topocentric zenith angle [degrees]
-    pub(crate) azimuth_astro: f64,  //topocentric azimuth angle (westward from south) [for astronomers]
-    pub(crate) azimuth: f64,        //topocentric azimuth angle (eastward from north) [for navigators and solar radiation]
-    pub(crate) incidence: f64,      //surface incidence angle [degrees]
+    pub zenith: f64,         //topocentric zenith angle [degrees]
+    pub azimuth_astro: f64,  //topocentric azimuth angle (westward from south) [for astronomers]
+    pub azimuth: f64,        //topocentric azimuth angle (eastward from north) [for navigators and solar radiation]
+    pub incidence: f64,      //surface incidence angle [degrees]
 
-    pub(crate) suntransit: f64,     //local sun transit time (or solar noon) [fractional hour]
-    pub(crate) sunrise: f64,        //local sunrise time (+/- 30 seconds) [fractional hour]
-    pub(crate) sunset: f64,         //local sunset time (+/- 30 seconds) [fractional hour]
+    pub suntransit: f64,     //local sun transit time (or solar noon) [fractional hour]
+    pub sunrise: f64,        //local sunrise time (+/- 30 seconds) [fractional hour]
+    pub sunset: f64,         //local sunset time (+/- 30 seconds) [fractional hour]
 }
 
 impl SpaData {
