@@ -1,30 +1,21 @@
-use spa_sra::spa::{Output, SpaData};
-use spa_sra::spa_calc;
+use spa_sra::spa::Function;
+use spa_sra::{spa_calc, SpaBuilder};
 
 #[test]
 fn builder_and_run() {
-    let mut spa = SpaData::new();
+    let mut spa = SpaBuilder::new()
+        .date_time(2003, 10, 17, 12, 30, 30.0)
+        .timezone(-7.0)
+        .lat_long(39.742476, -105.1786)
+        .pressure_temperature(820.0, 11.0)
+        .atmospheric_refraction(0.5667)
+        .elevation(1830.14)
+        .slope(30.0)
+        .azimuth_rotation(-10.0)
+        .delta_ut1(0.0)
+        .delta_t(67.0)
+        .build(Function::SpaAll);
 
-    // enter required input values into SPA structure
-
-    spa.year          = 2003;
-    spa.month         = 10;
-    spa.day           = 17;
-    spa.hour          = 12;
-    spa.minute        = 30;
-    spa.second        = 30.0;
-    spa.timezone      = -7.0;
-    spa.delta_ut1     = 0.0;
-    spa.delta_t       = 67.0;
-    spa.longitude     = -105.1786;
-    spa.latitude      = 39.742476;
-    spa.elevation     = 1830.14;
-    spa.pressure      = 820.0;
-    spa.temperature   = 11.0;
-    spa.slope         = 30.0;
-    spa.azm_rotation  = -10.0;
-    spa.atmos_refract = 0.5667;
-    spa.function      = Output::SpaAll;
 
     // call the SPA calculate function and pass the SPA structure
     // test and test results according original code
