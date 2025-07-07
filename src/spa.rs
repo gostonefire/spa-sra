@@ -102,65 +102,110 @@ pub struct SpaData {
 
     //-----------------Intermediate OUTPUT VALUES--------------------
 
-    pub(crate) jd: f64,             //Julian day
-    pub(crate) jc: f64,             //Julian century
+    /// Julian day
+    pub(crate) jd: f64,
+    /// Julian century
+    pub(crate) jc: f64,
 
-    pub(crate) jde: f64,            //Julian ephemeris day
-    pub(crate) jce: f64,            //Julian ephemeris century
-    pub(crate) jme: f64,            //Julian ephemeris millennium
+    /// Julian ephemeris day
+    pub(crate) jde: f64,
+    /// Julian ephemeris century
+    pub(crate) jce: f64,
+    /// Julian ephemeris millennium
+    pub(crate) jme: f64,
 
-    pub(crate) l: f64,              //earth heliocentric longitude [degrees]
-    pub(crate) b: f64,              //earth heliocentric latitude [degrees]
-    pub(crate) r: f64,              //earth radius vector [Astronomical Units, AU]
+    /// earth heliocentric longitude [degrees]
+    pub(crate) l: f64,
+    /// earth heliocentric latitude [degrees]
+    pub(crate) b: f64,
+    /// earth radius vector [Astronomical Units, AU]
+    pub(crate) r: f64,
 
-    pub(crate) theta: f64,          //geocentric longitude [degrees]
-    pub(crate) beta: f64,           //geocentric latitude [degrees]
+    /// geocentric longitude [degrees]
+    pub(crate) theta: f64,
+    /// geocentric latitude [degrees]
+    pub(crate) beta: f64,
 
-    pub(crate) x0: f64,             //mean elongation (moon-sun) [degrees]
-    pub(crate) x1: f64,             //mean anomaly (sun) [degrees]
-    pub(crate) x2: f64,             //mean anomaly (moon) [degrees]
-    pub(crate) x3: f64,             //argument latitude (moon) [degrees]
-    pub(crate) x4: f64,             //ascending longitude (moon) [degrees]
+    /// mean elongation (moon-sun) [degrees]
+    pub(crate) x0: f64,
+    /// mean anomaly (sun) [degrees]
+    pub(crate) x1: f64,
+    /// mean anomaly (moon) [degrees]
+    pub(crate) x2: f64,
+    /// argument latitude (moon) [degrees]
+    pub(crate) x3: f64,
+    /// ascending longitude (moon) [degrees]
+    pub(crate) x4: f64,
 
-    pub(crate) del_psi: f64,        //nutation longitude [degrees]
-    pub(crate) del_epsilon: f64,    //nutation obliquity [degrees]
-    pub(crate) epsilon0: f64,       //ecliptic mean obliquity [arc seconds]
-    pub(crate) epsilon: f64,        //ecliptic true obliquity  [degrees]
+    /// nutation longitude [degrees]
+    pub(crate) del_psi: f64,
+    /// nutation obliquity [degrees]
+    pub(crate) del_epsilon: f64,
+    /// ecliptic mean obliquity [arc seconds]
+    pub(crate) epsilon0: f64,
+    /// ecliptic true obliquity  [degrees]
+    pub(crate) epsilon: f64,
 
-    pub(crate) del_tau: f64,        //aberration correction [degrees]
-    pub(crate) lamda: f64,          //apparent sun longitude [degrees]
-    pub(crate) nu0: f64,            //Greenwich mean sidereal time [degrees]
-    pub(crate) nu: f64,             //Greenwich sidereal time [degrees]
+    /// aberration correction [degrees]
+    pub(crate) del_tau: f64,
+    /// apparent sun longitude [degrees]
+    pub(crate) lamda: f64,
+    /// Greenwich mean sidereal time [degrees]
+    pub(crate) nu0: f64,
+    /// Greenwich sidereal time [degrees]
+    pub(crate) nu: f64,
 
-    pub(crate) alpha: f64,          //geocentric sun right ascension [degrees]
-    pub(crate) delta: f64,          //geocentric sun declination [degrees]
+    /// geocentric sun right ascension [degrees]
+    pub(crate) alpha: f64,
+    /// geocentric sun declination [degrees]
+    pub(crate) delta: f64,
 
-    pub(crate) h: f64,              //observer hour angle [degrees]
-    pub(crate) xi: f64,             //sun equatorial horizontal parallax [degrees]
-    pub(crate) del_alpha: f64,      //sun right ascension parallax [degrees]
-    pub(crate) delta_prime: f64,    //topocentric sun declination [degrees]
-    pub(crate) alpha_prime: f64,    //topocentric sun right ascension [degrees]
-    pub(crate) h_prime: f64,        //topocentric local hour angle [degrees]
+    /// observer hour angle [degrees]
+    pub(crate) h: f64,
+    /// sun equatorial horizontal parallax [degrees]
+    pub(crate) xi: f64,
+    /// sun right ascension parallax [degrees]
+    pub(crate) del_alpha: f64,
+    /// topocentric sun declination [degrees]
+    pub(crate) delta_prime: f64,
+    /// topocentric sun right ascension [degrees]
+    pub(crate) alpha_prime: f64,
+    /// topocentric local hour angle [degrees]
+    pub(crate) h_prime: f64,
 
-    pub(crate) e0: f64,             //topocentric elevation angle (uncorrected) [degrees]
-    pub(crate) del_e: f64,          //atmospheric refraction correction [degrees]
-    pub(crate) e: f64,              //topocentric elevation angle (corrected) [degrees]
+    /// topocentric elevation angle (uncorrected) [degrees]
+    pub(crate) e0: f64,
+    /// atmospheric refraction correction [degrees]
+    pub(crate) del_e: f64,
+    /// topocentric elevation angle (corrected) [degrees]
+    pub(crate) e: f64,
 
-    pub(crate) eot: f64,            //equation of time [minutes]
-    pub(crate) srha: f64,           //sunrise hour angle [degrees]
-    pub(crate) ssha: f64,           //sunset hour angle [degrees]
-    pub(crate) sta: f64,            //sun transit altitude [degrees]
+    /// equation of time [minutes]
+    pub(crate) eot: f64,
+    /// sunrise hour angle [degrees]
+    pub(crate) srha: f64,
+    /// sunset hour angle [degrees]
+    pub(crate) ssha: f64,
+    /// sun transit altitude [degrees]
+    pub(crate) sta: f64,
 
     //---------------------Final OUTPUT VALUES------------------------
 
-    pub zenith: f64,         //topocentric zenith angle [degrees]
-    pub azimuth_astro: f64,  //topocentric azimuth angle (westward from south) [for astronomers]
-    pub azimuth: f64,        //topocentric azimuth angle (eastward from north) [for navigators and solar radiation]
-    pub incidence: f64,      //surface incidence angle [degrees]
+    /// topocentric zenith angle [degrees]
+    pub zenith: f64,
+    /// topocentric azimuth angle (westward from south) [for astronomers]
+    pub azimuth_astro: f64,
+    /// topocentric azimuth angle (eastward from north) [for navigators and solar radiation]
+    pub azimuth: f64,
+    /// surface incidence angle [degrees]
+    pub incidence: f64,
 
-    pub suntransit: f64,     //local sun transit time (or solar noon) [fractional hour]
-    pub sunrise: f64,        //local sunrise time (+/- 30 seconds) [fractional hour]
-    pub sunset: f64,         //local sunset time (+/- 30 seconds) [fractional hour]
+    /// local sun transit time (or solar noon) [fractional hour]
+    pub suntransit: f64,
+    /// local sunrise time (+/- 30 seconds) [fractional hour]
+    pub sunrise: f64,
+    /// local sunset time (+/- 30 seconds) [fractional hour]
+    pub sunset: f64,
 }
 
 impl SpaData {
