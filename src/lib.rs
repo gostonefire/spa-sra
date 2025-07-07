@@ -9,7 +9,62 @@ pub mod spa;
 pub mod errors;
 
 /// Builder for creating an operational SpaData struct
-/// 
+///
+/// Example usage which gives the same results as in the original C program test code:
+/// ```rust
+/// use spa_sra::SpaBuilder;
+/// use spa_sra::errors::SpaError;
+/// use spa_sra::spa::{Function, SpaData};
+///
+/// fn main() {
+///
+///     match get_spa() {
+///         Err(e) => { println!("{}", e) },
+///         Ok(spa) => {
+///             println!("Julian Day:    {:.6}", spa.spa_za.jd);
+///             println!("L:             {:.6e} degrees", spa.spa_za.l);
+///             println!("B:             {:.6e} degrees", spa.spa_za.b);
+///             println!("R:             {:.6} AU", spa.spa_za.r);
+///             println!("H:             {:.6} degrees", spa.spa_za.h);
+///             println!("Delta Psi:     {:.6e} degrees", spa.spa_za.del_psi);
+///             println!("Delta Epsilon: {:.6e} degrees", spa.spa_za.del_epsilon);
+///             println!("Epsilon:       {:.6} degrees", spa.spa_za.epsilon);
+///
+///             println!("Zenith:        {:.6} degrees", spa.spa_za.zenith);
+///             println!("Azimuth:       {:.6} degrees", spa.spa_za.azimuth);
+///             println!("Incidence:     {:.6} degrees", spa.spa_za_inc.incidence);
+///
+///             let mut min: f64 = 60.0 * (spa.spa_za_rts.sunrise - (spa.spa_za_rts.sunrise as i64) as f64);
+///             let mut sec: f64 = 60.0 * (min - (min as i64) as f64);
+///             println!("Sunrise:       {:0>2}:{:0>2}:{:0>2} Local Time", spa.spa_za_rts.sunrise as i64, min as i64, sec as i64);
+///
+///             min = 60.0 * (spa.spa_za_rts.sunset - (spa.spa_za_rts.sunset as i64) as f64);
+///             sec = 60.0 * (min - (min as i64) as f64);
+///             println!("Sunset:        {:0>2}:{:0>2}:{:0>2} Local Time", spa.spa_za_rts.sunset as i64, min as i64, sec as i64);
+///         }
+///     }
+/// }
+///
+/// fn get_spa() -> Result<SpaData, SpaError<'static>> {
+///
+///     let spa = SpaBuilder::new()
+///         .date(2003, 10, 17)?
+///         .time(12, 30, 30.0)?
+///         .timezone(-7.0)?
+///         .lat_long(39.742476, -105.1786)?
+///         .pressure_temperature(820.0, 11.0)?
+///         .atmospheric_refraction(0.5667)?
+///         .elevation(1830.14)?
+///         .slope(30.0)?
+///         .azimuth_rotation(-10.0)?
+///         .delta_ut1(0.0)?
+///         .delta_t(67.0)?
+///         .build_and_calculate(Function::SpaAll)?;
+///
+///     Ok(spa)
+/// }
+/// ```
+///
 pub struct SpaBuilder {
     input: Input,
 }
@@ -30,7 +85,7 @@ impl SpaBuilder {
     ///
     /// # Arguments
     ///
-    /// * 'spa' - existing `SpaData`struct
+    /// * 'spa' - existing `SpaData` struct
     pub fn from_spa_data(spa: SpaData) -> Self {
         Self { input: spa.input }
     }
@@ -88,7 +143,7 @@ impl SpaBuilder {
         Ok(self)
     }
     
-    /// Sets observer latitude (negative south of equator) and longitude (negative west of Greenwich)
+    /// Sets observer latitude (negative south of the equator) and longitude (negative west of Greenwich)
     /// 
     /// # Arguments
     /// 
