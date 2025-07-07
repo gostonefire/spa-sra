@@ -1,5 +1,6 @@
 use crate::constants::{B_COUNT, B_SUBCOUNT, JD_COUNT, JD_MINUS, JD_PLUS, JD_ZERO, L_COUNT, L_SUBCOUNT, R_COUNT, R_SUBCOUNT, SUN_COUNT, SUN_RADIUS, SUN_RISE, SUN_SET, SUN_TRANSIT, TERM_A, TERM_B, TERM_C, TERM_COUNT, TERM_EPS_C, TERM_EPS_D, TERM_PSI_A, TERM_PSI_B, TERM_X0, TERM_X1, TERM_X2, TERM_X3, TERM_X4, TERM_X_COUNT, TERM_Y_COUNT, Y_COUNT};
 use crate::earth_periodic_terms::{B_TERMS, L_TERMS, R_TERMS};
+use crate::errors::{SpaError, MESSAGES};
 use crate::utils;
 use crate::utils::{atmospheric_refraction_correction, deg2rad, geocentric_declination, geocentric_right_ascension, limit_degrees, observer_hour_angle, rad2deg, right_ascension_parallax_and_topocentric_dec, third_order_polynomial, topocentric_azimuth_angle, topocentric_azimuth_angle_astro, topocentric_elevation_angle, topocentric_elevation_angle_corrected, topocentric_local_hour_angle, topocentric_right_ascension};
 use crate::nutation_obliquity_periodic_terms::{PE_TERMS, Y_TERMS};
@@ -280,9 +281,8 @@ impl SpaData {
     /// Calculate all SPA parameters and put into structure
     /// Note: All inputs values (listed in header file) must already be in structure
     ///
-    pub fn spa_calculate(&mut self) -> i64 {
+    pub fn spa_calculate(&mut self) -> Result<(), SpaError<'static>> {
         let result: i64 = self.validate_inputs();
-
         if result == 0 {
             self.jd = julian_day(self.year, self.month, self.day, self.hour,
                                  self.minute, self.second, self.delta_ut1, self.timezone);
@@ -316,9 +316,12 @@ impl SpaData {
             if self.function == Function::SpaZaRts || self.function == Function::SpaAll {
                 self.calculate_eot_and_sun_rise_transit_set();
             }
-        }
 
-        result
+            Ok(())
+
+        } else {
+            Err(SpaError{ code: result, message: MESSAGES[result as usize] })
+        }
     }
 
     /// Validates inputs
@@ -345,7 +348,7 @@ impl SpaData {
 
         if self.function == Function::SpaZaInc || self.function == Function::SpaAll {
             if self.slope.abs()  > 360.0 { return 14 };
-            if self.azm_rotation > 360.0 { return 15 };
+            if self.azm_rotation.abs() > 360.0 { return 15 };
         }
 
         0

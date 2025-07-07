@@ -1,3 +1,4 @@
+use crate::errors::{SpaError, MESSAGES};
 use crate::spa::{Function, SpaData};
 
 mod earth_periodic_terms;
@@ -5,6 +6,7 @@ mod constants;
 mod nutation_obliquity_periodic_terms;
 mod utils;
 pub mod spa;
+mod errors;
 
 /// Builder for creating an operational SpaData struct
 /// 
@@ -15,7 +17,8 @@ pub struct SpaBuilder {
 impl SpaBuilder {
     /// Creates a new SpaBuilder with default values as of original code tests, hence an immediate
     /// call to the `build` function with argument Function::SpaAll returns a fully operational
-    /// SpaData struct which when invoking the XXXXX will output those test results.
+    /// SpaData struct which when invoking the `spa_calculate` SpaData function will calculate those
+    /// test results.
     ///
     /// To change any settings, just use the builder object and call whatever change is needed and
     /// then call the `build` function to get the new SpaData struct ready for execution with the
@@ -24,37 +27,69 @@ impl SpaBuilder {
     pub fn new() -> Self {
         Self { spa: SpaData::new() }
     }
+
+    /// Creates a new SpaBuilder from an existing `SpaData`struct.
+    ///
+    /// Useful to for instance re-run calculations after just changing one or a few settings
+    ///
+    /// # Arguments
+    ///
+    /// * 'spa' - existing `SpaData`struct
+    pub fn from_spa_data(spa: SpaData) -> Self {
+        Self { spa }
+    }
     
-    /// Sets date and time
+    /// Sets date
     /// 
     /// # Arguments
     /// 
     /// * 'year' - 4-digit year, valid range: -2000 to 6000
     /// * 'month' - 2-digit month, valid range: 1 to  12
     /// * 'day' - 2-digit day, valid range: 1 to  31
-    /// * 'hour' - Observer local hour, valid range: 0 to  24
-    /// * 'minute' - Observer local minute, valid range: 0 to  59
-    /// * 'second' - Observer local second, valid range: 0 to <60 (accepts fraction)
-    pub fn date_time(mut self, year: i64, month: i64, day: i64, hour: i64, minute: i64, second: f64) -> Self {
+    pub fn date(mut self, year: i64, month: i64, day: i64) -> Result<Self, SpaError<'static>> {
+        if year        < -2000   || year        > 6000   { return Err(SpaError{ code: 1, message: MESSAGES[1] }) };
+        if month       < 1       || month       > 12     { return Err(SpaError{ code: 2, message: MESSAGES[2] }) };
+        if day         < 1       || day         > 31     { return Err(SpaError{ code: 3, message: MESSAGES[3] }) };
+
         self.spa.year = year;
         self.spa.month = month;
         self.spa.day = day;
+
+        Ok(self)
+    }
+
+    /// Sets time
+    ///
+    /// # Arguments
+    ///
+    /// * 'hour' - Observer local hour, valid range: 0 to  24
+    /// * 'minute' - Observer local minute, valid range: 0 to  59
+    /// * 'second' - Observer local second, valid range: 0 to <60 (accepts fraction)
+    pub fn time(mut self, hour: i64, minute: i64, second: f64) -> Result<Self, SpaError<'static>> {
+        if hour        < 0       || hour        > 24     { return Err(SpaError{ code: 4, message: MESSAGES[4] }) };
+        if minute      < 0       || minute      > 59     { return Err(SpaError{ code: 5, message: MESSAGES[5] }) };
+        if second      < 0.0     || second      >=60.0   { return Err(SpaError{ code: 6, message: MESSAGES[6] }) };
+        if hour        == 24     && minute      > 0      { return Err(SpaError{ code: 5, message: MESSAGES[5] }) };
+        if hour        == 24     && second      > 0.0    { return Err(SpaError{ code: 6, message: MESSAGES[6] }) };
+
         self.spa.hour = hour;
         self.spa.minute = minute;
         self.spa.second = second;
-        
-        self
+
+        Ok(self)
     }
-    
+
     /// Sets observer time zone (negative west of Greenwich)
     ///
     /// # Arguments
     /// 
     /// * 'timezone' - valid range: -18 to 18 hours
-    pub fn timezone(mut self, timezone: f64) -> Self {
+    pub fn timezone(mut self, timezone: f64) -> Result<Self, SpaError<'static>> {
+        if timezone.abs()      > 18.0       { return Err(SpaError{ code: 8, message: MESSAGES[8] }) };
+
         self.spa.timezone = timezone;
         
-        self
+        Ok(self)
     }
     
     /// Sets observer latitude (negative south of equator) and longitude (negative west of Greenwich)
@@ -63,11 +98,14 @@ impl SpaBuilder {
     /// 
     /// * 'latitude' - valid range: -90 to 90 degrees
     /// * 'longitude' - valid range: -180 to 180 degrees
-    pub fn lat_long(mut self, latitude: f64, longitude: f64) -> Self {
+    pub fn lat_long(mut self, latitude: f64, longitude: f64) -> Result<Self, SpaError<'static>> {
+        if longitude.abs()     > 180.0      { return Err(SpaError{ code: 9, message: MESSAGES[9] }) };
+        if latitude.abs()      > 90.0       { return Err(SpaError{ code: 10, message: MESSAGES[10] }) };
+
         self.spa.latitude = latitude;
         self.spa.longitude = longitude;
         
-        self
+        Ok(self)
     }
     
     /// Sets annual average local pressure [millibars] and annual average local temperature [degrees Celsius]
@@ -76,11 +114,14 @@ impl SpaBuilder {
     /// 
     /// * 'pressure' - valid range: 0 to 5000 millibars
     /// * 'temperature' - valid range: -273 to 6000 degrees Celsius
-    pub fn pressure_temperature(mut self, pressure: f64, temperature: f64) -> Self {
+    pub fn pressure_temperature(mut self, pressure: f64, temperature: f64) -> Result<Self, SpaError<'static>> {
+        if pressure    < 0.0     || pressure    > 5000.0 { return Err(SpaError{ code: 12, message: MESSAGES[12] }) };
+        if temperature <= -273.0 || temperature > 6000.0 { return Err(SpaError{ code: 13, message: MESSAGES[13] }) };
+
         self.spa.pressure = pressure;
         self.spa.temperature = temperature;
         
-        self
+        Ok(self)
     }
     
     /// Sets atmospheric refraction at sunrise and sunset (0.5667 deg is typical)
@@ -88,10 +129,12 @@ impl SpaBuilder {
     /// # Arguments
     /// 
     /// * 'atmos_refract' - valid range: -5 to 5 degrees
-    pub fn atmospheric_refraction(mut self, atmos_refract: f64) -> Self {
+    pub fn atmospheric_refraction(mut self, atmos_refract: f64) -> Result<Self, SpaError<'static>> {
+        if atmos_refract.abs() > 5.0        { return Err(SpaError{ code: 16, message: MESSAGES[16] }) };
+
         self.spa.atmos_refract = atmos_refract;
         
-        self
+        Ok(self)
     }
     
     /// Sets observer elevation [meters]
@@ -99,21 +142,28 @@ impl SpaBuilder {
     /// # Arguments
     /// 
     /// * 'elevation' - valid range: -6500000 or higher meters
-    pub fn elevation(mut self, elevation: f64) -> Self {
+    pub fn elevation(mut self, elevation: f64) -> Result<Self, SpaError<'static>> {
+        if elevation           < -6500000.0 { return Err(SpaError{ code: 11, message: MESSAGES[11] }) };
+
         self.spa.elevation = elevation;
         
-        self
+        Ok(self)
     }
     
     /// Sets surface slope (measured from the horizontal plane)
+    ///
+    /// No need to set this unless `Function::SpaZaInc` or `Function::SpaAll` will be used
+    /// when building.
     /// 
     /// # Arguments
     /// 
     /// * 'slope' - valid range: -360 to 360 degrees
-    pub fn slope(mut self, slope: f64) -> Self {
+    pub fn slope(mut self, slope: f64) -> Result<Self, SpaError<'static>> {
+        if slope.abs()  > 360.0 { return Err(SpaError{ code: 14, message: MESSAGES[14] }) };
+
         self.spa.slope = slope;
         
-        self
+        Ok(self)
     }
     
     /// Sets surface azimuth rotation (measured from south to projection of
@@ -122,10 +172,12 @@ impl SpaBuilder {
     /// # Arguments
     /// 
     /// * 'azm_rotation' - -360 to 360 degrees
-    pub fn azimuth_rotation(mut self, azm_rotation: f64) -> Self {
+    pub fn azimuth_rotation(mut self, azm_rotation: f64) -> Result<Self, SpaError<'static>> {
+        if azm_rotation.abs() > 360.0 { return Err(SpaError{ code: 15, message: MESSAGES[15] }) };
+
         self.spa.azm_rotation = azm_rotation;
         
-        self
+        Ok(self)
     }
     
     /// Fractional second difference between UTC and UT which is used
@@ -137,10 +189,12 @@ impl SpaBuilder {
     /// # Arguments
     /// 
     /// * 'delta_ut1' - valid range: -1 to 1 second (exclusive)
-    pub fn delta_ut1(mut self, delta_ut1: f64) -> Self {
+    pub fn delta_ut1(mut self, delta_ut1: f64) -> Result<Self, SpaError<'static>> {
+        if delta_ut1   <= -1.0   || delta_ut1   >= 1.0   { return Err(SpaError{ code: 17, message: MESSAGES[17] }) };
+
         self.spa.delta_ut1 = delta_ut1;
         
-        self
+        Ok(self)
     }
     
     /// Difference between earth rotation time and terrestrial time
@@ -151,10 +205,12 @@ impl SpaBuilder {
     /// # Arguments
     /// 
     /// * 'delta_t' - valid range: -8000 to 8000 seconds
-    pub fn delta_t(mut self, delta_t: f64) -> Self {
+    pub fn delta_t(mut self, delta_t: f64) -> Result<Self, SpaError<'static>> {
+        if delta_t.abs()       > 8000.0     { return Err(SpaError{ code: 7, message: MESSAGES[7] }) };
+
         self.spa.delta_t = delta_t;
         
-        self
+        Ok(self)
     }
 
     /// Builds and return a SpaData struct ready to execute.
@@ -174,14 +230,24 @@ impl SpaBuilder {
     pub fn build(mut self, function: Function) -> SpaData {
         self.spa.function = function;
 
-        self.spa.clone()
+        self.spa
+    }
+
+    /// Builds and calculates a SpaData struct
+    ///
+    /// See builder method `build` for more information
+    ///
+    ///# Arguments
+    ///
+    /// * 'function' - switch to choose functions for desired output (from enumeration `Function`)
+    pub fn build_and_calculate(mut self, function: Function) -> Result<SpaData, SpaError<'static>> {
+        self.spa.function = function;
+        self.spa.spa_calculate()?;
+
+        Ok(self.spa)
     }
 }
 
-pub fn spa_calc(spa: &mut SpaData) -> i64  {
-    spa.spa_calculate()
-    //spa_calculate(spa)
-}
 
 #[cfg(test)]
 mod tests {
@@ -216,8 +282,9 @@ mod tests {
         // call the SPA calculate function and pass the SPA structure
         // test and test results according original code
 
-        let result = spa_calc(&mut spa);
-        assert_eq!(result, 0, "SPA Error Code: 0");
+        if let Err(e) = spa.spa_calculate() {
+            panic!("{}", e);
+        }
 
         assert_eq!(format!("{:.6}", spa.jd), "2452930.312847",        "Julian Day:    2452930.312847");
         assert_eq!(format!("{:.6e}", spa.l), "2.401826e1",            "L:             2.401826e+01 degrees");
