@@ -6,6 +6,7 @@ use crate::utils::{atmospheric_refraction_correction, deg2rad, geocentric_declin
 use crate::nutation_obliquity_periodic_terms::{PE_TERMS, Y_TERMS};
 
 /// Enumeration for function codes to select desired final outputs from SPA
+///
 #[derive(PartialEq, Clone)]
 pub enum Function {
     /// calculate zenith and azimuth
@@ -18,10 +19,10 @@ pub enum Function {
     SpaAll,
 }
 
+/// Struct holding all input values for SPA-SRA calculations
+///
 #[derive(Clone)]
-pub struct SpaData {
-    //----------------------INPUT VALUES------------------------
-
+pub struct Input {
     /// 4-digit year,      valid range: -2000 to 6000, error code: 1
     pub year: i64,
     /// 2-digit month,         valid range: 1 to  12,  error code: 2
@@ -40,7 +41,7 @@ pub struct SpaData {
     /// from observation only and is reported in this bulletin:
     /// http://maia.usno.navy.mil/ser7/ser7.dat,
     /// where delta_ut1 = DUT1
-    /// 
+    ///
     /// valid range: -1 to 1 second (exclusive), error code 17
     pub delta_ut1: f64,
 
@@ -48,170 +49,67 @@ pub struct SpaData {
     /// It is derived from observation only and is reported in this
     /// bulletin: http://maia.usno.navy.mil/ser7/ser7.dat,
     /// where delta_t = 32.184 + (TAI-UTC) - DUT1
-    /// 
+    ///
     /// valid range: -8000 to 8000 seconds, error code: 7
     pub delta_t: f64,
 
     /// Observer time zone (negative west of Greenwich)
-    /// 
+    ///
     /// valid range: -18   to   18 hours,   error code: 8
     pub timezone: f64,
 
     /// Observer longitude (negative west of Greenwich)
-    /// 
+    ///
     /// valid range: -180  to  180 degrees, error code: 9
     pub longitude: f64,
 
     /// Observer latitude (negative south of equator)
-    /// 
+    ///
     /// valid range: -90   to   90 degrees, error code: 10
     pub latitude: f64,
 
     /// Observer elevation [meters]
-    /// 
+    ///
     /// valid range: -6500000 or higher meters,    error code: 11
     pub elevation: f64,
 
     /// Annual average local pressure [millibars]
-    /// 
+    ///
     /// valid range:    0 to 5000 millibars,       error code: 12
     pub pressure: f64,
 
     /// Annual average local temperature [degrees Celsius]
-    /// 
+    ///
     /// valid range: -273 to 6000 degrees Celsius, error code; 13
     pub temperature: f64,
 
     /// Surface slope (measured from the horizontal plane)
-    /// 
+    ///
     /// valid range: -360 to 360 degrees, error code: 14
     pub slope: f64,
 
     /// Surface azimuth rotation (measured from south to projection of
     /// surface normal on horizontal plane, negative east)
-    /// 
+    ///
     /// valid range: -360 to 360 degrees, error code: 15
     pub azm_rotation: f64,
 
     /// Atmospheric refraction at sunrise and sunset (0.5667 deg is typical)
-    /// 
+    ///
     /// valid range: -5   to   5 degrees, error code: 16
     pub atmos_refract: f64,
 
     /// Switch to choose functions for desired output (from enumeration)
     pub function: Function,
 
-    //-----------------Intermediate OUTPUT VALUES--------------------
-
-    /// Julian day
-    pub(crate) jd: f64,
-    /// Julian century
-    pub(crate) jc: f64,
-
-    /// Julian ephemeris day
-    pub(crate) jde: f64,
-    /// Julian ephemeris century
-    pub(crate) jce: f64,
-    /// Julian ephemeris millennium
-    pub(crate) jme: f64,
-
-    /// earth heliocentric longitude [degrees]
-    pub(crate) l: f64,
-    /// earth heliocentric latitude [degrees]
-    pub(crate) b: f64,
-    /// earth radius vector [Astronomical Units, AU]
-    pub(crate) r: f64,
-
-    /// geocentric longitude [degrees]
-    pub(crate) theta: f64,
-    /// geocentric latitude [degrees]
-    pub(crate) beta: f64,
-
-    /// mean elongation (moon-sun) [degrees]
-    pub(crate) x0: f64,
-    /// mean anomaly (sun) [degrees]
-    pub(crate) x1: f64,
-    /// mean anomaly (moon) [degrees]
-    pub(crate) x2: f64,
-    /// argument latitude (moon) [degrees]
-    pub(crate) x3: f64,
-    /// ascending longitude (moon) [degrees]
-    pub(crate) x4: f64,
-
-    /// nutation longitude [degrees]
-    pub(crate) del_psi: f64,
-    /// nutation obliquity [degrees]
-    pub(crate) del_epsilon: f64,
-    /// ecliptic mean obliquity [arc seconds]
-    pub(crate) epsilon0: f64,
-    /// ecliptic true obliquity  [degrees]
-    pub(crate) epsilon: f64,
-
-    /// aberration correction [degrees]
-    pub(crate) del_tau: f64,
-    /// apparent sun longitude [degrees]
-    pub(crate) lamda: f64,
-    /// Greenwich mean sidereal time [degrees]
-    pub(crate) nu0: f64,
-    /// Greenwich sidereal time [degrees]
-    pub(crate) nu: f64,
-
-    /// geocentric sun right ascension [degrees]
-    pub(crate) alpha: f64,
-    /// geocentric sun declination [degrees]
-    pub(crate) delta: f64,
-
-    /// observer hour angle [degrees]
-    pub(crate) h: f64,
-    /// sun equatorial horizontal parallax [degrees]
-    pub(crate) xi: f64,
-    /// sun right ascension parallax [degrees]
-    pub(crate) del_alpha: f64,
-    /// topocentric sun declination [degrees]
-    pub(crate) delta_prime: f64,
-    /// topocentric sun right ascension [degrees]
-    pub(crate) alpha_prime: f64,
-    /// topocentric local hour angle [degrees]
-    pub(crate) h_prime: f64,
-
-    /// topocentric elevation angle (uncorrected) [degrees]
-    pub(crate) e0: f64,
-    /// atmospheric refraction correction [degrees]
-    pub(crate) del_e: f64,
-    /// topocentric elevation angle (corrected) [degrees]
-    pub(crate) e: f64,
-
-    /// equation of time [minutes]
-    pub(crate) eot: f64,
-    /// sunrise hour angle [degrees]
-    pub(crate) srha: f64,
-    /// sunset hour angle [degrees]
-    pub(crate) ssha: f64,
-    /// sun transit altitude [degrees]
-    pub(crate) sta: f64,
-
-    //---------------------Final OUTPUT VALUES------------------------
-
-    /// topocentric zenith angle [degrees]
-    pub zenith: f64,
-    /// topocentric azimuth angle (westward from south) [for astronomers]
-    pub azimuth_astro: f64,
-    /// topocentric azimuth angle (eastward from north) [for navigators and solar radiation]
-    pub azimuth: f64,
-    /// surface incidence angle [degrees]
-    pub incidence: f64,
-
-    /// local sun transit time (or solar noon) [fractional hour]
-    pub suntransit: f64,
-    /// local sunrise time (+/- 30 seconds) [fractional hour]
-    pub sunrise: f64,
-    /// local sunset time (+/- 30 seconds) [fractional hour]
-    pub sunset: f64,
 }
 
-impl SpaData {
+impl Input {
+
+    /// Creates a new `Input` struct with values defaulting to original tests
+    ///
     pub fn new() -> Self {
-        SpaData {
+        Input {
             year: 2003,
             month: 10,
             day: 17,
@@ -230,6 +128,138 @@ impl SpaData {
             azm_rotation: -10.0,
             atmos_refract: 0.5667,
             function: Function::SpaAll,
+        }
+    }
+
+    /// Validates inputs
+    ///
+    fn validate_inputs(&self) -> i64 {
+        if self.year        < -2000   || self.year        > 6000   { return 1 };
+        if self.month       < 1       || self.month       > 12     { return 2 };
+        if self.day         < 1       || self.day         > 31     { return 3 };
+        if self.hour        < 0       || self.hour        > 24     { return 4 };
+        if self.minute      < 0       || self.minute      > 59     { return 5 };
+        if self.second      < 0.0     || self.second      >=60.0   { return 6 };
+        if self.pressure    < 0.0     || self.pressure    > 5000.0 { return 12 };
+        if self.temperature <= -273.0 || self.temperature > 6000.0 { return 13 };
+        if self.delta_ut1   <= -1.0   || self.delta_ut1   >= 1.0   { return 17 };
+        if self.hour        == 24     && self.minute      > 0      { return 5 };
+        if self.hour        == 24     && self.second      > 0.0    { return 6 };
+
+        if self.delta_t.abs()       > 8000.0     { return 7 };
+        if self.timezone.abs()      > 18.0       { return 8 };
+        if self.longitude.abs()     > 180.0      { return 9 };
+        if self.latitude.abs()      > 90.0       { return 10 };
+        if self.atmos_refract.abs() > 5.0        { return 16 };
+        if self.elevation           < -6500000.0 { return 11 };
+
+        if self.function == Function::SpaZaInc || self.function == Function::SpaAll {
+            if self.slope.abs()  > 360.0 { return 14 };
+            if self.azm_rotation.abs() > 360.0 { return 15 };
+        }
+
+        0
+    }
+}
+
+/// Struct to collect all common output values from `SpaZa` and `SpaAll` calculations
+///
+#[derive(Clone)]
+pub struct SpaZa {
+    //-----------------Intermediate OUTPUT VALUES--------------------
+
+    /// Julian day
+    pub jd: f64,
+    /// Julian century
+    pub jc: f64,
+
+    /// Julian ephemeris day
+    pub jde: f64,
+    /// Julian ephemeris century
+    pub jce: f64,
+    /// Julian ephemeris millennium
+    pub jme: f64,
+
+    /// earth heliocentric longitude [degrees]
+    pub l: f64,
+    /// earth heliocentric latitude [degrees]
+    pub b: f64,
+    /// earth radius vector [Astronomical Units, AU]
+    pub r: f64,
+
+    /// geocentric longitude [degrees]
+    pub theta: f64,
+    /// geocentric latitude [degrees]
+    pub beta: f64,
+
+    /// mean elongation (moon-sun) [degrees]
+    pub x0: f64,
+    /// mean anomaly (sun) [degrees]
+    pub x1: f64,
+    /// mean anomaly (moon) [degrees]
+    pub x2: f64,
+    /// argument latitude (moon) [degrees]
+    pub x3: f64,
+    /// ascending longitude (moon) [degrees]
+    pub x4: f64,
+
+    /// nutation longitude [degrees]
+    pub del_psi: f64,
+    /// nutation obliquity [degrees]
+    pub del_epsilon: f64,
+    /// ecliptic mean obliquity [arc seconds]
+    pub epsilon0: f64,
+    /// ecliptic true obliquity  [degrees]
+    pub epsilon: f64,
+
+    /// aberration correction [degrees]
+    pub del_tau: f64,
+    /// apparent sun longitude [degrees]
+    pub lamda: f64,
+    /// Greenwich mean sidereal time [degrees]
+    pub nu0: f64,
+    /// Greenwich sidereal time [degrees]
+    pub nu: f64,
+
+    /// geocentric sun right ascension [degrees]
+    pub alpha: f64,
+    /// geocentric sun declination [degrees]
+    pub delta: f64,
+
+    /// observer hour angle [degrees]
+    pub h: f64,
+    /// sun equatorial horizontal parallax [degrees]
+    pub xi: f64,
+    /// sun right ascension parallax [degrees]
+    pub del_alpha: f64,
+    /// topocentric sun declination [degrees]
+    pub delta_prime: f64,
+    /// topocentric sun right ascension [degrees]
+    pub alpha_prime: f64,
+    /// topocentric local hour angle [degrees]
+    pub h_prime: f64,
+
+    /// topocentric elevation angle (uncorrected) [degrees]
+    pub e0: f64,
+    /// atmospheric refraction correction [degrees]
+    pub del_e: f64,
+    /// topocentric elevation angle (corrected) [degrees]
+    pub e: f64,
+
+    /// topocentric zenith angle [degrees]
+    pub zenith: f64,
+    /// topocentric azimuth angle (westward from south) [for astronomers]
+    pub azimuth_astro: f64,
+    /// topocentric azimuth angle (eastward from north) [for navigators and solar radiation]
+    pub azimuth: f64,
+
+}
+
+impl SpaZa {
+    /// Creates a new `SpaZa` struct with zeroed values
+    ///
+    pub fn new() -> Self {
+        SpaZa {
             jd: 0.0,
             jc: 0.0,
             jde: 0.0,
@@ -264,17 +294,83 @@ impl SpaData {
             e0: 0.0,
             del_e: 0.0,
             e: 0.0,
+            zenith: 0.0,
+            azimuth_astro: 0.0,
+            azimuth: 0.0,
+        }
+    }
+}
+
+/// Struct to collect all specific output values from `SpaZaInc`
+///
+#[derive(Clone)]
+pub struct SpaZaInc {
+    pub incidence: f64,
+}
+
+/// Struct to collect all specific output values from `SpaZaRts`
+///
+#[derive(Clone)]
+pub struct SpaZaRts {
+    //-----------------Intermediate OUTPUT VALUES--------------------
+
+    /// equation of time [minutes]
+    pub(crate) eot: f64,
+    /// sunrise hour angle [degrees]
+    pub(crate) srha: f64,
+    /// sunset hour angle [degrees]
+    pub(crate) ssha: f64,
+    /// sun transit altitude [degrees]
+    pub(crate) sta: f64,
+
+    //---------------------Final OUTPUT VALUES------------------------
+
+    /// local sun transit time (or solar noon) [fractional hour]
+    pub suntransit: f64,
+    /// local sunrise time (+/- 30 seconds) [fractional hour]
+    pub sunrise: f64,
+    /// local sunset time (+/- 30 seconds) [fractional hour]
+    pub sunset: f64,
+}
+
+impl SpaZaRts {
+    /// Creates a new `SpaZaRts` struct with zeroed values
+    ///
+    pub fn new() -> Self {
+        SpaZaRts {
             eot: 0.0,
             srha: 0.0,
             ssha: 0.0,
             sta: 0.0,
-            zenith: 0.0,
-            azimuth_astro: 0.0,
-            azimuth: 0.0,
-            incidence: 0.0,
             suntransit: 0.0,
             sunrise: 0.0,
             sunset: 0.0,
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct SpaData {
+    /// Input values for all `Function` functions
+    pub input: Input,
+
+    /// Intermediate and final output values for all available `Function` functions
+    pub spa_za: SpaZa,
+
+    /// Final output values for `Function::SpaZaInc` and `Function::SpaAll`
+    pub spa_za_inc: SpaZaInc,
+
+    /// Intermediate and final output values for `Function::SpaZaRts` and `Function::SpaAll`
+    pub spa_za_rts: SpaZaRts,
+}
+
+impl SpaData {
+    pub fn new(input: Input) -> Self {
+        SpaData {
+            input,
+            spa_za: SpaZa::new(),
+            spa_za_inc: SpaZaInc { incidence: 0.0 },
+            spa_za_rts: SpaZaRts::new(),
         }
     }
 
@@ -282,38 +378,38 @@ impl SpaData {
     /// Note: All inputs values (listed in header file) must already be in structure
     ///
     pub fn spa_calculate(&mut self) -> Result<(), SpaError<'static>> {
-        let result: i64 = self.validate_inputs();
+        let result: i64 = self.input.validate_inputs();
         if result == 0 {
-            self.jd = julian_day(self.year, self.month, self.day, self.hour,
-                                 self.minute, self.second, self.delta_ut1, self.timezone);
+            self.spa_za.jd = julian_day(self.input.year, self.input.month, self.input.day, self.input.hour,
+                                 self.input.minute, self.input.second, self.input.delta_ut1, self.input.timezone);
 
             self.calculate_geocentric_sun_right_ascension_and_declination();
 
-            self.h  = observer_hour_angle(self.nu, self.longitude, self.alpha);
-            self.xi = sun_equatorial_horizontal_parallax(self.r);
+            self.spa_za.h  = observer_hour_angle(self.spa_za.nu, self.input.longitude, self.spa_za.alpha);
+            self.spa_za.xi = sun_equatorial_horizontal_parallax(self.spa_za.r);
 
-            right_ascension_parallax_and_topocentric_dec(self.latitude, self.elevation, self.xi,
-                                                         self.h, self.delta, &mut self.del_alpha, &mut self.delta_prime);
+            right_ascension_parallax_and_topocentric_dec(self.input.latitude, self.input.elevation, self.spa_za.xi,
+                                                         self.spa_za.h, self.spa_za.delta, &mut self.spa_za.del_alpha, &mut self.spa_za.delta_prime);
 
-            self.alpha_prime = topocentric_right_ascension(self.alpha, self.del_alpha);
-            self.h_prime     = topocentric_local_hour_angle(self.h, self.del_alpha);
+            self.spa_za.alpha_prime = topocentric_right_ascension(self.spa_za.alpha, self.spa_za.del_alpha);
+            self.spa_za.h_prime     = topocentric_local_hour_angle(self.spa_za.h, self.spa_za.del_alpha);
 
-            self.e0      = topocentric_elevation_angle(self.latitude, self.delta_prime, self.h_prime);
-            self.del_e   = atmospheric_refraction_correction(self.pressure, self.temperature,
-                                                             self.atmos_refract, self.e0);
-            self.e       = topocentric_elevation_angle_corrected(self.e0, self.del_e);
+            self.spa_za.e0      = topocentric_elevation_angle(self.input.latitude, self.spa_za.delta_prime, self.spa_za.h_prime);
+            self.spa_za.del_e   = atmospheric_refraction_correction(self.input.pressure, self.input.temperature,
+                                                                    self.input.atmos_refract, self.spa_za.e0);
+            self.spa_za.e       = topocentric_elevation_angle_corrected(self.spa_za.e0, self.spa_za.del_e);
 
-            self.zenith        = utils::topocentric_zenith_angle(self.e);
-            self.azimuth_astro = topocentric_azimuth_angle_astro(self.h_prime, self.latitude,
-                                                                 self.delta_prime);
-            self.azimuth       = topocentric_azimuth_angle(self.azimuth_astro);
+            self.spa_za.zenith        = utils::topocentric_zenith_angle(self.spa_za.e);
+            self.spa_za.azimuth_astro = topocentric_azimuth_angle_astro(self.spa_za.h_prime, self.input.latitude,
+                                                                        self.spa_za.delta_prime);
+            self.spa_za.azimuth       = topocentric_azimuth_angle(self.spa_za.azimuth_astro);
 
-            if self.function == Function::SpaZaInc || self.function == Function::SpaAll {
-                self.incidence  = surface_incidence_angle(self.zenith, self.azimuth_astro,
-                                                          self.azm_rotation, self.slope);
+            if self.input.function == Function::SpaZaInc || self.input.function == Function::SpaAll {
+                self.spa_za_inc.incidence  = surface_incidence_angle(self.spa_za.zenith, self.spa_za.azimuth_astro,
+                                                                     self.input.azm_rotation, self.input.slope);
             }
 
-            if self.function == Function::SpaZaRts || self.function == Function::SpaAll {
+            if self.input.function == Function::SpaZaRts || self.input.function == Function::SpaAll {
                 self.calculate_eot_and_sun_rise_transit_set();
             }
 
@@ -324,35 +420,7 @@ impl SpaData {
         }
     }
 
-    /// Validates inputs
-    ///
-    fn validate_inputs(&self) -> i64 {
-        if self.year        < -2000   || self.year        > 6000   { return 1 };
-        if self.month       < 1       || self.month       > 12     { return 2 };
-        if self.day         < 1       || self.day         > 31     { return 3 };
-        if self.hour        < 0       || self.hour        > 24     { return 4 };
-        if self.minute      < 0       || self.minute      > 59     { return 5 };
-        if self.second      < 0.0     || self.second      >=60.0   { return 6 };
-        if self.pressure    < 0.0     || self.pressure    > 5000.0 { return 12 };
-        if self.temperature <= -273.0 || self.temperature > 6000.0 { return 13 };
-        if self.delta_ut1   <= -1.0   || self.delta_ut1   >= 1.0   { return 17 };
-        if self.hour        == 24     && self.minute      > 0      { return 5 };
-        if self.hour        == 24     && self.second      > 0.0    { return 6 };
 
-        if self.delta_t.abs()       > 8000.0     { return 7 };
-        if self.timezone.abs()      > 18.0       { return 8 };
-        if self.longitude.abs()     > 180.0      { return 9 };
-        if self.latitude.abs()      > 90.0       { return 10 };
-        if self.atmos_refract.abs() > 5.0        { return 16 };
-        if self.elevation           < -6500000.0 { return 11 };
-
-        if self.function == Function::SpaZaInc || self.function == Function::SpaAll {
-            if self.slope.abs()  > 360.0 { return 14 };
-            if self.azm_rotation.abs() > 360.0 { return 15 };
-        }
-
-        0
-    }
     /// Calculate Equation of Time (EOT) and Sun Rise, Transit, & Set (RTS)
     ///
     fn calculate_eot_and_sun_rise_transit_set(&mut self) {
@@ -369,32 +437,32 @@ impl SpaData {
         let mut delta_prime: [f64;SUN_COUNT] = [0.0; SUN_COUNT];
         let mut h_prime: [f64;SUN_COUNT] = [0.0; SUN_COUNT];
 
-        let h0_prime: f64 = -1.0 * (SUN_RADIUS + self.atmos_refract);
+        let h0_prime: f64 = -1.0 * (SUN_RADIUS + self.input.atmos_refract);
 
-        let m: f64 = sun_mean_longitude(self.jme);
-        self.eot = eot(m, self.alpha, self.del_psi, self.epsilon);
+        let m: f64 = sun_mean_longitude(self.spa_za.jme);
+        self.spa_za_rts.eot = eot(m, self.spa_za.alpha, self.spa_za.del_psi, self.spa_za.epsilon);
 
-        sun_rts.hour = 0; sun_rts.minute = 0; sun_rts.second = 0.0;
-        sun_rts.delta_ut1 = 0.0; sun_rts.timezone = 0.0;
+        sun_rts.input.hour = 0; sun_rts.input.minute = 0; sun_rts.input.second = 0.0;
+        sun_rts.input.delta_ut1 = 0.0; sun_rts.input.timezone = 0.0;
 
-        sun_rts.jd = julian_day (sun_rts.year,   sun_rts.month,  sun_rts.day,       sun_rts.hour,
-                                 sun_rts.minute, sun_rts.second, sun_rts.delta_ut1, sun_rts.timezone);
+        sun_rts.spa_za.jd = julian_day (sun_rts.input.year,   sun_rts.input.month,  sun_rts.input.day,       sun_rts.input.hour,
+                                        sun_rts.input.minute, sun_rts.input.second, sun_rts.input.delta_ut1, sun_rts.input.timezone);
 
         sun_rts.calculate_geocentric_sun_right_ascension_and_declination();
-        let nu: f64 = sun_rts.nu;
+        let nu: f64 = sun_rts.spa_za.nu;
 
-        sun_rts.delta_t = 0.0;
-        sun_rts.jd -= 1.0;
+        sun_rts.input.delta_t = 0.0;
+        sun_rts.spa_za.jd -= 1.0;
 
         for i in 0..JD_COUNT {
             sun_rts.calculate_geocentric_sun_right_ascension_and_declination();
-            alpha[i] = sun_rts.alpha;
-            delta[i] = sun_rts.delta;
-            sun_rts.jd += 1.0;
+            alpha[i] = sun_rts.spa_za.alpha;
+            delta[i] = sun_rts.spa_za.delta;
+            sun_rts.spa_za.jd += 1.0;
         }
 
-        m_rts[SUN_TRANSIT] = approx_sun_transit_time(alpha[JD_ZERO], self.longitude, nu);
-        let h0: f64 = sun_hour_angle_at_rise_set(self.latitude, delta[JD_ZERO], h0_prime);
+        m_rts[SUN_TRANSIT] = approx_sun_transit_time(alpha[JD_ZERO], self.input.longitude, nu);
+        let h0: f64 = sun_hour_angle_at_rise_set(self.input.latitude, delta[JD_ZERO], h0_prime);
 
         if h0 >= 0.0 {
             approx_sun_rise_and_set(&mut m_rts, h0);
@@ -402,34 +470,34 @@ impl SpaData {
             for i in 0..SUN_COUNT {
                 nu_rts[i]      = nu + 360.985647*m_rts[i];
 
-                let n: f64     = m_rts[i] + self.delta_t / 86400.0;
+                let n: f64     = m_rts[i] + self.input.delta_t / 86400.0;
                 alpha_prime[i] = rts_alpha_delta_prime(&alpha, n);
                 delta_prime[i] = rts_alpha_delta_prime(&delta, n);
 
-                h_prime[i]     = limit_degrees180pm(nu_rts[i] + self.longitude - alpha_prime[i]);
+                h_prime[i]     = limit_degrees180pm(nu_rts[i] + self.input.longitude - alpha_prime[i]);
 
-                h_rts[i]       = rts_sun_altitude(self.latitude, delta_prime[i], h_prime[i]);
+                h_rts[i]       = rts_sun_altitude(self.input.latitude, delta_prime[i], h_prime[i]);
             }
 
-            self.srha = h_prime[SUN_RISE];
-            self.ssha = h_prime[SUN_SET];
-            self.sta  = h_rts[SUN_TRANSIT];
+            self.spa_za_rts.srha = h_prime[SUN_RISE];
+            self.spa_za_rts.ssha = h_prime[SUN_SET];
+            self.spa_za_rts.sta  = h_rts[SUN_TRANSIT];
 
-            self.suntransit = dayfrac_to_local_hr(m_rts[SUN_TRANSIT] - h_prime[SUN_TRANSIT] / 360.0, self.timezone);
+            self.spa_za_rts.suntransit = dayfrac_to_local_hr(m_rts[SUN_TRANSIT] - h_prime[SUN_TRANSIT] / 360.0, self.input.timezone);
 
-            self.sunrise = dayfrac_to_local_hr(sun_rise_and_set(&m_rts, &h_rts, &delta_prime,
-                                                                self.latitude, &h_prime, h0_prime, SUN_RISE), self.timezone);
+            self.spa_za_rts.sunrise = dayfrac_to_local_hr(sun_rise_and_set(&m_rts, &h_rts, &delta_prime,
+                                                                           self.input.latitude, &h_prime, h0_prime, SUN_RISE), self.input.timezone);
 
-            self.sunset  = dayfrac_to_local_hr(sun_rise_and_set(&m_rts, &h_rts, &delta_prime,
-                                                                self.latitude, &h_prime, h0_prime, SUN_SET), self.timezone);
+            self.spa_za_rts.sunset  = dayfrac_to_local_hr(sun_rise_and_set(&m_rts, &h_rts, &delta_prime,
+                                                                           self.input.latitude, &h_prime, h0_prime, SUN_SET), self.input.timezone);
 
         } else {
-            self.srha       = -99999.0;
-            self.ssha       = -99999.0;
-            self.sta        = -99999.0;
-            self.suntransit = -99999.0;
-            self.sunrise    = -99999.0;
-            self.sunset     = -99999.0;
+            self.spa_za_rts.srha       = -99999.0;
+            self.spa_za_rts.ssha       = -99999.0;
+            self.spa_za_rts.sta        = -99999.0;
+            self.spa_za_rts.suntransit = -99999.0;
+            self.spa_za_rts.sunrise    = -99999.0;
+            self.spa_za_rts.sunset     = -99999.0;
         }
     }
 
@@ -442,37 +510,37 @@ impl SpaData {
     fn calculate_geocentric_sun_right_ascension_and_declination(&mut self) {
         let mut x: [f64;TERM_X_COUNT] = [0.0; TERM_X_COUNT];
 
-        self.jc = julian_century(self.jd);
+        self.spa_za.jc = julian_century(self.spa_za.jd);
 
-        self.jde = julian_ephemeris_day(self.jd, self.delta_t);
-        self.jce = julian_ephemeris_century(self.jde);
-        self.jme = julian_ephemeris_millennium(self.jce);
+        self.spa_za.jde = julian_ephemeris_day(self.spa_za.jd, self.input.delta_t);
+        self.spa_za.jce = julian_ephemeris_century(self.spa_za.jde);
+        self.spa_za.jme = julian_ephemeris_millennium(self.spa_za.jce);
 
-        self.l = earth_heliocentric_longitude(self.jme);
-        self.b = earth_heliocentric_latitude(self.jme);
-        self.r = earth_radius_vector(self.jme);
+        self.spa_za.l = earth_heliocentric_longitude(self.spa_za.jme);
+        self.spa_za.b = earth_heliocentric_latitude(self.spa_za.jme);
+        self.spa_za.r = earth_radius_vector(self.spa_za.jme);
 
-        self.theta = geocentric_longitude(self.l);
-        self.beta  = geocentric_latitude(self.b);
+        self.spa_za.theta = geocentric_longitude(self.spa_za.l);
+        self.spa_za.beta  = geocentric_latitude(self.spa_za.b);
 
-        x[TERM_X0] = { self.x0 = mean_elongation_moon_sun(self.jce); self.x0 };
-        x[TERM_X1] = { self.x1 = mean_anomaly_sun(self.jce);         self.x1 };
-        x[TERM_X2] = { self.x2 = mean_anomaly_moon(self.jce);        self.x2 };
-        x[TERM_X3] = { self.x3 = argument_latitude_moon(self.jce);   self.x3 };
-        x[TERM_X4] = { self.x4 = ascending_longitude_moon(self.jce); self.x4 };
+        x[TERM_X0] = { self.spa_za.x0 = mean_elongation_moon_sun(self.spa_za.jce); self.spa_za.x0 };
+        x[TERM_X1] = { self.spa_za.x1 = mean_anomaly_sun(self.spa_za.jce);         self.spa_za.x1 };
+        x[TERM_X2] = { self.spa_za.x2 = mean_anomaly_moon(self.spa_za.jce);        self.spa_za.x2 };
+        x[TERM_X3] = { self.spa_za.x3 = argument_latitude_moon(self.spa_za.jce);   self.spa_za.x3 };
+        x[TERM_X4] = { self.spa_za.x4 = ascending_longitude_moon(self.spa_za.jce); self.spa_za.x4 };
 
         self.nutation_longitude_and_obliquity(&x);
 
-        self.epsilon0 = ecliptic_mean_obliquity(self.jme);
-        self.epsilon  = ecliptic_true_obliquity(self.del_epsilon, self.epsilon0);
+        self.spa_za.epsilon0 = ecliptic_mean_obliquity(self.spa_za.jme);
+        self.spa_za.epsilon  = ecliptic_true_obliquity(self.spa_za.del_epsilon, self.spa_za.epsilon0);
 
-        self.del_tau   = aberration_correction(self.r);
-        self.lamda     = apparent_sun_longitude(self.theta, self.del_psi, self.del_tau);
-        self.nu0       = greenwich_mean_sidereal_time(self.jd, self.jc);
-        self.nu        = greenwich_sidereal_time(self.nu0, self.del_psi, self.epsilon);
+        self.spa_za.del_tau   = aberration_correction(self.spa_za.r);
+        self.spa_za.lamda     = apparent_sun_longitude(self.spa_za.theta, self.spa_za.del_psi, self.spa_za.del_tau);
+        self.spa_za.nu0       = greenwich_mean_sidereal_time(self.spa_za.jd, self.spa_za.jc);
+        self.spa_za.nu        = greenwich_sidereal_time(self.spa_za.nu0, self.spa_za.del_psi, self.spa_za.epsilon);
 
-        self.alpha = geocentric_right_ascension(self.lamda, self.epsilon, self.beta);
-        self.delta = geocentric_declination(self.beta, self.epsilon, self.lamda);
+        self.spa_za.alpha = geocentric_right_ascension(self.spa_za.lamda, self.spa_za.epsilon, self.spa_za.beta);
+        self.spa_za.delta = geocentric_declination(self.spa_za.beta, self.spa_za.epsilon, self.spa_za.lamda);
     }
 
     fn nutation_longitude_and_obliquity(&mut self, x: &[f64]) {
@@ -481,12 +549,12 @@ impl SpaData {
 
         for i in 0..Y_COUNT {
             let xy_term_sum  = deg2rad(xy_term_summation(i, x));
-            sum_psi     += (PE_TERMS[i][TERM_PSI_A] + self.jce * PE_TERMS[i][TERM_PSI_B]) * xy_term_sum.sin();
-            sum_epsilon += (PE_TERMS[i][TERM_EPS_C] + self.jce * PE_TERMS[i][TERM_EPS_D]) * xy_term_sum.cos();
+            sum_psi     += (PE_TERMS[i][TERM_PSI_A] + self.spa_za.jce * PE_TERMS[i][TERM_PSI_B]) * xy_term_sum.sin();
+            sum_epsilon += (PE_TERMS[i][TERM_EPS_C] + self.spa_za.jce * PE_TERMS[i][TERM_EPS_D]) * xy_term_sum.cos();
         }
 
-        self.del_psi = sum_psi / 36000000.0;
-        self.del_epsilon = sum_epsilon / 36000000.0;
+        self.spa_za.del_psi = sum_psi / 36000000.0;
+        self.spa_za.del_epsilon = sum_epsilon / 36000000.0;
     }
 }
 

@@ -25,18 +25,18 @@ fn builder_and_run() {
         panic!("{}", e);
     }
 
-    assert_eq!(format!("{:.6}", spa.zenith), "50.111622",         "Zenith:        50.111622 degrees");
-    assert_eq!(format!("{:.6}", spa.azimuth), "194.340241",       "Azimuth:       194.340241 degrees");
-    assert_eq!(format!("{:.6}", spa.incidence), "25.187000",      "Incidence:     25.187000 degrees");
+    assert_eq!(format!("{:.6}", spa.spa_za.zenith),        "50.111622",         "Zenith:        50.111622 degrees");
+    assert_eq!(format!("{:.6}", spa.spa_za.azimuth),       "194.340241",       "Azimuth:       194.340241 degrees");
+    assert_eq!(format!("{:.6}", spa.spa_za_inc.incidence), "25.187000",      "Incidence:     25.187000 degrees");
 
-    let mut min: f64 = 60.0 * (spa.sunrise - (spa.sunrise as i64) as f64);
+    let mut min: f64 = 60.0 * (spa.spa_za_rts.sunrise - (spa.spa_za_rts.sunrise as i64) as f64);
     let mut sec: f64 = 60.0 * (min - (min as i64) as f64);
-    assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.sunrise as i64, min as i64, sec as i64), "06:12:43",
+    assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.spa_za_rts.sunrise as i64, min as i64, sec as i64), "06:12:43",
                "Sunrise: 06:12:43 Local Time");
 
-    min = 60.0 * (spa.sunset - (spa.sunset as i64) as f64);
+    min = 60.0 * (spa.spa_za_rts.sunset - (spa.spa_za_rts.sunset as i64) as f64);
     sec = 60.0 * (min - (min as i64) as f64);
-    assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.sunset as i64, min as i64, sec as i64), "17:20:19",
+    assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.spa_za_rts.sunset as i64, min as i64, sec as i64), "17:20:19",
                "Sunset: 17:20:19 Local Time");
 }
 
@@ -58,17 +58,17 @@ fn build_and_calculate() {
 
     // test and test results according original code
 
-    assert_eq!(format!("{:.6}", spa.zenith), "50.111622",         "Zenith:        50.111622 degrees");
-    assert_eq!(format!("{:.6}", spa.azimuth), "194.340241",       "Azimuth:       194.340241 degrees");
-    assert_eq!(format!("{:.6}", spa.incidence), "25.187000",      "Incidence:     25.187000 degrees");
+    assert_eq!(format!("{:.6}", spa.spa_za.zenith),        "50.111622",         "Zenith:        50.111622 degrees");
+    assert_eq!(format!("{:.6}", spa.spa_za.azimuth),       "194.340241",       "Azimuth:       194.340241 degrees");
+    assert_eq!(format!("{:.6}", spa.spa_za_inc.incidence), "25.187000",      "Incidence:     25.187000 degrees");
 
-    let mut min: f64 = 60.0 * (spa.sunrise - (spa.sunrise as i64) as f64);
+    let mut min: f64 = 60.0 * (spa.spa_za_rts.sunrise - (spa.spa_za_rts.sunrise as i64) as f64);
     let mut sec: f64 = 60.0 * (min - (min as i64) as f64);
-    assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.sunrise as i64, min as i64, sec as i64), "06:12:43",
+    assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.spa_za_rts.sunrise as i64, min as i64, sec as i64), "06:12:43",
                "Sunrise: 06:12:43 Local Time");
 
-    min = 60.0 * (spa.sunset - (spa.sunset as i64) as f64);
+    min = 60.0 * (spa.spa_za_rts.sunset - (spa.spa_za_rts.sunset as i64) as f64);
     sec = 60.0 * (min - (min as i64) as f64);
-    assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.sunset as i64, min as i64, sec as i64), "17:20:19",
+    assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.spa_za_rts.sunset as i64, min as i64, sec as i64), "17:20:19",
                "Sunset: 17:20:19 Local Time");
 }
