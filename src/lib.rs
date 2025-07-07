@@ -6,7 +6,7 @@ mod constants;
 mod nutation_obliquity_periodic_terms;
 mod utils;
 pub mod spa;
-mod errors;
+pub mod errors;
 
 /// Builder for creating an operational SpaData struct
 /// 
