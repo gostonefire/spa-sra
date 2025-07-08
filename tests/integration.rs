@@ -76,9 +76,9 @@ fn build_and_calculate() {
 #[cfg(feature = "chrono_0_4")]
 #[test]
 fn feature_chrono_0_4() {
-    use chrono::{FixedOffset, TimeZone};
+    use chrono::{FixedOffset, TimeZone, Timelike};
 
-    let date_time = FixedOffset::west_opt(7 * 3600)
+    let date_time = FixedOffset::east_opt(-7 * 3600)
         .unwrap()
         .with_ymd_and_hms(2003, 10, 17, 12, 30, 30)
         .unwrap();
@@ -111,4 +111,13 @@ fn feature_chrono_0_4() {
     assert_eq!(format!("{:0>2}:{:0>2}:{:0>2}", spa.spa_za_rts.sunset as i64, min as i64, sec as i64), "17:20:19",
                "Sunset: 17:20:19 Local Time");
 
+    let was = spa.get_sunrise(date_time.timezone());
+    let should = FixedOffset::east_opt(-7 * 3600)
+        .unwrap()
+        .with_ymd_and_hms(2003, 10, 17, 06, 12, 43)
+        .unwrap()
+        .with_nanosecond(439793424)
+        .unwrap();
+
+    assert_eq!(was, should);
 }

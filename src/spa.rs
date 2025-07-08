@@ -1,3 +1,5 @@
+#[cfg(feature = "chrono_0_4")]
+use chrono::{DateTime, TimeZone, Timelike, FixedOffset};
 use crate::constants::{B_COUNT, B_SUBCOUNT, JD_COUNT, JD_MINUS, JD_PLUS, JD_ZERO, L_COUNT, L_SUBCOUNT, R_COUNT, R_SUBCOUNT, SUN_COUNT, SUN_RADIUS, SUN_RISE, SUN_SET, SUN_TRANSIT, TERM_A, TERM_B, TERM_C, TERM_COUNT, TERM_EPS_C, TERM_EPS_D, TERM_PSI_A, TERM_PSI_B, TERM_X0, TERM_X1, TERM_X2, TERM_X3, TERM_X4, TERM_X_COUNT, TERM_Y_COUNT, Y_COUNT};
 use crate::earth_periodic_terms::{B_TERMS, L_TERMS, R_TERMS};
 use crate::errors::{SpaError, MESSAGES};
@@ -557,6 +559,108 @@ impl SpaData {
         self.spa_za.del_psi = sum_psi / 36000000.0;
         self.spa_za.del_epsilon = sum_epsilon / 36000000.0;
     }
+
+    /// Returns the sunrise as a [DateTime] object including nanoseconds
+    ///
+    /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
+    /// 
+    /// The function requires a specific [TimeZone], even if the SpaBuilder::date_time function
+    /// was used to build the SpaData struct. This since return polymorphism is simply to tricky.
+    /// Easiest way to get the same timezone as was used in the builder is to retrieve it from
+    /// the DateTime object that was supplied to the SpaBuilder::date_time,
+    /// e.g. the_date_object.timezone()
+    ///
+    /// if you don't care about having the correct timezone, use the [SpaData::get_sunrise_fixed_tz] instead.
+    ///
+    /// # Arguments
+    ///
+    /// * 'tz' - timezone to set to the resulting DateTime object
+    #[cfg(feature = "chrono_0_4")]
+    pub fn get_sunrise<T: TimeZone>(&self, tz: T) -> DateTime<T> {
+        let time_comp = get_time_components(self.spa_za_rts.sunrise);
+
+        tz.with_ymd_and_hms(self.input.year as i32, self.input.month as u32, self.input.day as u32,
+                            time_comp.0, time_comp.1, time_comp.2).unwrap()
+            .with_nanosecond(time_comp.3).unwrap()
+    }
+
+    /// Returns the sunrise as a [DateTime<FixedOffset>] object including nanoseconds
+    /// 
+    /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
+    /// 
+    #[cfg(feature = "chrono_0_4")]
+    pub fn get_sunrise_fixed_tz(&self) -> DateTime<FixedOffset> {
+        let time_comp = get_time_components(self.spa_za_rts.sunrise);
+
+        FixedOffset::east_opt((self.input.timezone * 3600.0) as i32).unwrap()
+            .with_ymd_and_hms(self.input.year as i32, self.input.month as u32, self.input.day as u32,
+                            time_comp.0, time_comp.1, time_comp.2).unwrap()
+            .with_nanosecond(time_comp.3).unwrap()
+    }
+
+    /// Returns the sunset as a [DateTime] object including nanoseconds
+    ///
+    /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
+    ///
+    /// See [SpaData::get_sunrise] for more information about the TimeZone
+    ///
+    /// # Arguments
+    ///
+    /// * 'tz' - timezone to set to the resulting DateTime object
+    #[cfg(feature = "chrono_0_4")]
+    pub fn get_sunset<T: TimeZone>(&self, tz: T) -> DateTime<T> {
+        let time_comp = get_time_components(self.spa_za_rts.sunset);
+
+        tz.with_ymd_and_hms(self.input.year as i32, self.input.month as u32, self.input.day as u32,
+                            time_comp.0, time_comp.1, time_comp.2).unwrap()
+            .with_nanosecond(time_comp.3).unwrap()
+    }
+
+    /// Returns the sunset as a [DateTime<FixedOffset>] object including nanoseconds
+    ///
+    /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
+    ///
+    #[cfg(feature = "chrono_0_4")]
+    pub fn get_sunset_fixed_tz(&self) -> DateTime<FixedOffset> {
+        let time_comp = get_time_components(self.spa_za_rts.sunset);
+
+        FixedOffset::east_opt((self.input.timezone * 3600.0) as i32).unwrap()
+            .with_ymd_and_hms(self.input.year as i32, self.input.month as u32, self.input.day as u32,
+                              time_comp.0, time_comp.1, time_comp.2).unwrap()
+            .with_nanosecond(time_comp.3).unwrap()
+    }
+
+    /// Returns the suntransit as a [DateTime] object including nanoseconds
+    ///
+    /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
+    ///
+    /// See [SpaData::get_sunrise] for more information about the TimeZone
+    ///
+    /// # Arguments
+    ///
+    /// * 'tz' - timezone to set to the resulting DateTime object
+    #[cfg(feature = "chrono_0_4")]
+    pub fn get_suntransit<T: TimeZone>(&self, tz: T) -> DateTime<T> {
+        let time_comp = get_time_components(self.spa_za_rts.suntransit);
+
+        tz.with_ymd_and_hms(self.input.year as i32, self.input.month as u32, self.input.day as u32,
+                            time_comp.0, time_comp.1, time_comp.2).unwrap()
+            .with_nanosecond(time_comp.3).unwrap()
+    }
+
+    /// Returns the suntransit as a [DateTime<FixedOffset>] object including nanoseconds
+    ///
+    /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
+    ///
+    #[cfg(feature = "chrono_0_4")]
+    pub fn get_suntransit_fixed_tz(&self) -> DateTime<FixedOffset> {
+        let time_comp = get_time_components(self.spa_za_rts.suntransit);
+
+        FixedOffset::east_opt((self.input.timezone * 3600.0) as i32).unwrap()
+            .with_ymd_and_hms(self.input.year as i32, self.input.month as u32, self.input.day as u32,
+                              time_comp.0, time_comp.1, time_comp.2).unwrap()
+            .with_nanosecond(time_comp.3).unwrap()
+    }
 }
 
 fn integer(value: f64) -> f64 {
@@ -838,4 +942,17 @@ fn rts_sun_altitude(latitude: f64, delta_prime: f64, h_prime: f64) -> f64 {
 fn sun_rise_and_set(m_rts: &[f64], h_rts: &[f64], delta_prime: &[f64], latitude: f64, h_prime: &[f64], h0_prime: f64, sun: usize) -> f64 {
     m_rts[sun] + (h_rts[sun] - h0_prime) /
         (360.0 * deg2rad(delta_prime[sun]).cos() * deg2rad(latitude).cos() * deg2rad(h_prime[sun]).sin())
+}
+
+/// Returns time components given an hour with fractions
+///
+/// # Arguments
+///
+/// * 'frac_time' - hour with fraction
+fn get_time_components(frac_time: f64) -> (u32, u32, u32, u32) {
+    let min: f64 = 60.0 * (frac_time - (frac_time as i64) as f64);
+    let sec: f64 = 60.0 * (min - (min as i64) as f64);
+    let nano: u32 = ((sec - (sec as i64) as f64) * 1_000_000_000f64) as u32;
+
+        (frac_time as u32, min as u32, sec as u32, nano)
 }
