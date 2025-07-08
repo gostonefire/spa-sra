@@ -1,6 +1,10 @@
 [package]
 name = "spa-sra"
-version = "0.1.5"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
+chrono = {version = "0.4", optional = true}
+
+[features]
+chrono_0_4 = ["dep:chrono"]

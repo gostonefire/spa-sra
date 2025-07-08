@@ -1,3 +1,5 @@
+#[cfg(feature = "chrono_0_4")]
+use chrono::{DateTime, Datelike, Offset, TimeZone, Timelike};
 use crate::errors::{SpaError, MESSAGES};
 use crate::spa::{Function, Input, SpaData};
 
@@ -126,6 +128,21 @@ impl SpaBuilder {
         self.input.hour = hour;
         self.input.minute = minute;
         self.input.second = second;
+
+        Ok(self)
+    }
+
+    #[cfg(feature = "chrono_0_4")]
+    pub fn date_time<T: TimeZone>(mut self, date_time: DateTime<T>) -> Result<Self, SpaError<'static>> {
+
+        self.input.year = date_time.year() as i64;
+        self.input.month = date_time.month() as i64;
+        self.input.day = date_time.day() as i64;
+        self.input.hour = date_time.hour() as i64;
+        self.input.minute = date_time.minute() as i64;
+        self.input.second = date_time.second() as f64 + date_time.nanosecond() as f64 / 1_000_000_000f64;
+
+        self.input.timezone = date_time.offset().fix().local_minus_utc() as f64 / 3600.0;
 
         Ok(self)
     }
