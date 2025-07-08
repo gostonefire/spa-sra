@@ -132,6 +132,14 @@ impl SpaBuilder {
         Ok(self)
     }
 
+    /// Sets all date and time fields to the [SpaData] struct from the given date_time
+    /// parameter.
+    ///
+    /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
+    ///
+    /// # Arguments
+    ///
+    /// * 'date_time' - a [DateTime] object including the time zone
     #[cfg(feature = "chrono_0_4")]
     pub fn date_time<T: TimeZone>(mut self, date_time: DateTime<T>) -> Result<Self, SpaError<'static>> {
 
