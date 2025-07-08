@@ -68,17 +68,17 @@ pub struct Input {
     /// valid range: -90   to   90 degrees, error code: 10
     pub latitude: f64,
 
-    /// Observer elevation [meters]
+    /// Observer elevation \[meters\]
     ///
     /// valid range: -6500000 or higher meters,    error code: 11
     pub elevation: f64,
 
-    /// Annual average local pressure [millibars]
+    /// Annual average local pressure \[millibars\]
     ///
     /// valid range:    0 to 5000 millibars,       error code: 12
     pub pressure: f64,
 
-    /// Annual average local temperature [degrees Celsius]
+    /// Annual average local temperature \[degrees Celsius\]
     ///
     /// valid range: -273 to 6000 degrees Celsius, error code; 13
     pub temperature: f64,
@@ -180,77 +180,77 @@ pub struct SpaZa {
     /// Julian ephemeris millennium
     pub jme: f64,
 
-    /// earth heliocentric longitude [degrees]
+    /// earth heliocentric longitude \[degrees\]
     pub l: f64,
-    /// earth heliocentric latitude [degrees]
+    /// earth heliocentric latitude \[degrees\]
     pub b: f64,
-    /// earth radius vector [Astronomical Units, AU]
+    /// earth radius vector \[Astronomical Units, AU\]
     pub r: f64,
 
-    /// geocentric longitude [degrees]
+    /// geocentric longitude \[degrees\]
     pub theta: f64,
-    /// geocentric latitude [degrees]
+    /// geocentric latitude \[degrees\]
     pub beta: f64,
 
-    /// mean elongation (moon-sun) [degrees]
+    /// mean elongation (moon-sun) \[degrees\]
     pub x0: f64,
-    /// mean anomaly (sun) [degrees]
+    /// mean anomaly (sun) \[degrees\]
     pub x1: f64,
-    /// mean anomaly (moon) [degrees]
+    /// mean anomaly (moon) \[degrees\]
     pub x2: f64,
-    /// argument latitude (moon) [degrees]
+    /// argument latitude (moon) \[degrees\]
     pub x3: f64,
-    /// ascending longitude (moon) [degrees]
+    /// ascending longitude (moon) \[degrees\]
     pub x4: f64,
 
-    /// nutation longitude [degrees]
+    /// nutation longitude \[degrees\]
     pub del_psi: f64,
-    /// nutation obliquity [degrees]
+    /// nutation obliquity \[degrees\]
     pub del_epsilon: f64,
-    /// ecliptic mean obliquity [arc seconds]
+    /// ecliptic mean obliquity \[arc seconds\]
     pub epsilon0: f64,
-    /// ecliptic true obliquity  [degrees]
+    /// ecliptic true obliquity  \[degrees\]
     pub epsilon: f64,
 
-    /// aberration correction [degrees]
+    /// aberration correction \[degrees\]
     pub del_tau: f64,
-    /// apparent sun longitude [degrees]
+    /// apparent sun longitude \[degrees\]
     pub lamda: f64,
-    /// Greenwich mean sidereal time [degrees]
+    /// Greenwich mean sidereal time \[degrees\]
     pub nu0: f64,
-    /// Greenwich sidereal time [degrees]
+    /// Greenwich sidereal time \[degrees\]
     pub nu: f64,
 
-    /// geocentric sun right ascension [degrees]
+    /// geocentric sun right ascension \[degrees\]
     pub alpha: f64,
-    /// geocentric sun declination [degrees]
+    /// geocentric sun declination \[degrees\]
     pub delta: f64,
 
-    /// observer hour angle [degrees]
+    /// observer hour angle \[degrees\]
     pub h: f64,
-    /// sun equatorial horizontal parallax [degrees]
+    /// sun equatorial horizontal parallax \[degrees\]
     pub xi: f64,
-    /// sun right ascension parallax [degrees]
+    /// sun right ascension parallax \[degrees\]
     pub del_alpha: f64,
-    /// topocentric sun declination [degrees]
+    /// topocentric sun declination \[degrees\]
     pub delta_prime: f64,
-    /// topocentric sun right ascension [degrees]
+    /// topocentric sun right ascension \[degrees\]
     pub alpha_prime: f64,
-    /// topocentric local hour angle [degrees]
+    /// topocentric local hour angle \[degrees\]
     pub h_prime: f64,
 
-    /// topocentric elevation angle (uncorrected) [degrees]
+    /// topocentric elevation angle (uncorrected) \[degrees\]
     pub e0: f64,
-    /// atmospheric refraction correction [degrees]
+    /// atmospheric refraction correction \[degrees\]
     pub del_e: f64,
-    /// topocentric elevation angle (corrected) [degrees]
+    /// topocentric elevation angle (corrected) \[degrees\]
     pub e: f64,
 
-    /// topocentric zenith angle [degrees]
+    /// topocentric zenith angle \[degrees\]
     pub zenith: f64,
-    /// topocentric azimuth angle (westward from south) [for astronomers]
+    /// topocentric azimuth angle (westward from south) \[for astronomers\]
     pub azimuth_astro: f64,
-    /// topocentric azimuth angle (eastward from north) [for navigators and solar radiation]
+    /// topocentric azimuth angle (eastward from north) \[for navigators and solar radiation\]
     pub azimuth: f64,
 
 }
@@ -305,6 +305,7 @@ impl SpaZa {
 ///
 #[derive(Clone)]
 pub struct SpaZaInc {
+    /// surface incidence angle \[degrees\]
     pub incidence: f64,
 }
 
@@ -314,22 +315,22 @@ pub struct SpaZaInc {
 pub struct SpaZaRts {
     //-----------------Intermediate OUTPUT VALUES--------------------
 
-    /// equation of time [minutes]
+    /// equation of time \[minutes\]
     pub(crate) eot: f64,
-    /// sunrise hour angle [degrees]
+    /// sunrise hour angle \[degrees\]
     pub(crate) srha: f64,
-    /// sunset hour angle [degrees]
+    /// sunset hour angle \[degrees\]
     pub(crate) ssha: f64,
-    /// sun transit altitude [degrees]
+    /// sun transit altitude \[degrees\]
     pub(crate) sta: f64,
 
     //---------------------Final OUTPUT VALUES------------------------
 
-    /// local sun transit time (or solar noon) [fractional hour]
+    /// local sun transit time (or solar noon) \[fractional hour\]
     pub suntransit: f64,
-    /// local sunrise time (+/- 30 seconds) [fractional hour]
+    /// local sunrise time (+/- 30 seconds) \[fractional hour\]
     pub sunrise: f64,
-    /// local sunset time (+/- 30 seconds) [fractional hour]
+    /// local sunset time (+/- 30 seconds) \[fractional hour\]
     pub sunset: f64,
 }
 
@@ -351,16 +352,16 @@ impl SpaZaRts {
 
 #[derive(Clone)]
 pub struct SpaData {
-    /// Input values for all `Function` functions
+    /// Input values for all [Function] functions
     pub input: Input,
 
-    /// Intermediate and final output values for all available `Function` functions
+    /// Intermediate and final output values for all available [Function] functions
     pub spa_za: SpaZa,
 
-    /// Final output values for `Function::SpaZaInc` and `Function::SpaAll`
+    /// Final output values for [Function::SpaZaInc] and [Function::SpaAll]
     pub spa_za_inc: SpaZaInc,
 
-    /// Intermediate and final output values for `Function::SpaZaRts` and `Function::SpaAll`
+    /// Intermediate and final output values for [Function::SpaZaRts] and [Function::SpaAll]
     pub spa_za_rts: SpaZaRts,
 }
 
@@ -506,7 +507,7 @@ impl SpaData {
     ///
     /// # Arguments
     ///
-    /// * 'spa' - the `SpaData` struct
+    /// * 'spa' - the [SpaData] struct
     fn calculate_geocentric_sun_right_ascension_and_declination(&mut self) {
         let mut x: [f64;TERM_X_COUNT] = [0.0; TERM_X_COUNT];
 

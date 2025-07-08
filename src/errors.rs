@@ -33,9 +33,9 @@ pub(crate) const MESSAGES: [&str;18] = [
 /// * 8 -> Observer time zone (negative west of Greenwich) outside valid range: -18 to 18 hours
 /// * 9 -> Observer longitude (negative west of Greenwich) outside valid range: -180 to 180 degrees
 /// * 10 -> Observer latitude (negative south of equator) outside valid range: -90 to 90 degrees
-/// * 11 -> Observer elevation [meters] outside valid range: -6500000 or higher meters
-/// * 12 -> Annual average local pressure [millibars] outside valid range: 0 to 5000 millibars
-/// * 13 -> Annual average local temperature [degrees Celsius] outside valid range: -273 to 6000 degrees Celsius
+/// * 11 -> Observer elevation \[meters\] outside valid range: -6500000 or higher meters
+/// * 12 -> Annual average local pressure \[millibars\] outside valid range: 0 to 5000 millibars
+/// * 13 -> Annual average local temperature \[degrees Celsius\] outside valid range: -273 to 6000 degrees Celsius
 /// * 14 -> Surface slope (measured from the horizontal plane) outside valid range: -360 to 360 degrees
 /// * 15 -> Surface azimuth rotation (measured from south to projection of surface normal on horizontal plane, negative east) outside valid range: -360 to 360 degrees
 /// * 16 -> Atmospheric refraction at sunrise and sunset (0.5667 deg is typical) outside valid range: -5 to 5 degrees

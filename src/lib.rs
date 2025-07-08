@@ -73,21 +73,21 @@ pub struct SpaBuilder {
 
 impl SpaBuilder {
     /// Creates a new SpaBuilder with default values as of original code tests, hence an immediate
-    /// call to the `build` function with argument Function::SpaAll returns a fully operational
-    /// SpaData struct which when invoking the `spa_calculate` SpaData function will calculate those
+    /// call to the [SpaBuilder::build] function with argument [Function::SpaAll] returns a fully operational
+    /// SpaData struct which when invoking the [SpaData::spa_calculate] function will calculate those
     /// test results.
     /// 
     pub fn new() -> Self {
         Self { input: Input::new() }
     }
 
-    /// Creates a new SpaBuilder from an existing `SpaData`struct.
+    /// Creates a new SpaBuilder from an existing [SpaData] struct.
     ///
     /// Useful to for instance re-run calculations after just changing one or a few settings
     ///
     /// # Arguments
     ///
-    /// * 'spa' - existing `SpaData` struct
+    /// * 'spa' - existing [SpaData] struct
     pub fn from_spa_data(spa: SpaData) -> Self {
         Self { input: spa.input }
     }
@@ -176,7 +176,7 @@ impl SpaBuilder {
         Ok(self)
     }
     
-    /// Sets annual average local pressure [millibars] and annual average local temperature [degrees Celsius]
+    /// Sets annual average local pressure \[millibars\] and annual average local temperature \[degrees Celsius\]
     /// 
     /// # Arguments
     /// 
@@ -205,7 +205,7 @@ impl SpaBuilder {
         Ok(self)
     }
     
-    /// Sets observer elevation [meters]
+    /// Sets observer elevation \[meters\]
     /// 
     /// # Arguments
     /// 
@@ -220,7 +220,7 @@ impl SpaBuilder {
     
     /// Sets surface slope (measured from the horizontal plane)
     ///
-    /// No need to set this unless `Function::SpaZaInc` or `Function::SpaAll` will be used
+    /// No need to set this unless [Function::SpaZaInc] or [Function::SpaAll] will be used
     /// when building.
     /// 
     /// # Arguments
@@ -303,11 +303,11 @@ impl SpaBuilder {
 
     /// Builds and calculates a SpaData struct
     ///
-    /// See builder method `build` for more information
+    /// See builder method [SpaBuilder::build] for more information
     ///
     ///# Arguments
     ///
-    /// * 'function' - switch to choose functions for desired output (from enumeration `Function`)
+    /// * 'function' - switch to choose functions for desired output (from enumeration [Function])
     pub fn build_and_calculate(mut self, function: Function) -> Result<SpaData, SpaError<'static>> {
         self.input.function = function;
         let mut spa_data = SpaData::new(self.input);
