@@ -563,14 +563,14 @@ impl SpaData {
     /// Returns the sunrise as a [DateTime] object including nanoseconds
     ///
     /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
-    /// 
+    ///
     /// The function requires a specific [TimeZone], even if the SpaBuilder::date_time function
     /// was used to build the SpaData struct. This since return polymorphism is simply to tricky.
     /// Easiest way to get the same timezone as was used in the builder is to retrieve it from
     /// the DateTime object that was supplied to the SpaBuilder::date_time,
     /// e.g. the_date_object.timezone()
     ///
-    /// if you don't care about having the correct timezone, use the [SpaData::get_sunrise_fixed_tz] instead.
+    /// if you don't care about having the correct timezone, use the [SpaData::get_sunrise_fix] instead.
     ///
     /// # Arguments
     ///
@@ -585,11 +585,11 @@ impl SpaData {
     }
 
     /// Returns the sunrise as a [DateTime<FixedOffset>] object including nanoseconds
-    /// 
+    ///
     /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
-    /// 
+    ///
     #[cfg(feature = "chrono_0_4")]
-    pub fn get_sunrise_fixed_tz(&self) -> DateTime<FixedOffset> {
+    pub fn get_sunrise_fix(&self) -> DateTime<FixedOffset> {
         let time_comp = get_time_components(self.spa_za_rts.sunrise);
 
         FixedOffset::east_opt((self.input.timezone * 3600.0) as i32).unwrap()
@@ -621,7 +621,7 @@ impl SpaData {
     /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
     ///
     #[cfg(feature = "chrono_0_4")]
-    pub fn get_sunset_fixed_tz(&self) -> DateTime<FixedOffset> {
+    pub fn get_sunset_fix(&self) -> DateTime<FixedOffset> {
         let time_comp = get_time_components(self.spa_za_rts.sunset);
 
         FixedOffset::east_opt((self.input.timezone * 3600.0) as i32).unwrap()
@@ -653,7 +653,7 @@ impl SpaData {
     /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
     ///
     #[cfg(feature = "chrono_0_4")]
-    pub fn get_suntransit_fixed_tz(&self) -> DateTime<FixedOffset> {
+    pub fn get_suntransit_fix(&self) -> DateTime<FixedOffset> {
         let time_comp = get_time_components(self.spa_za_rts.suntransit);
 
         FixedOffset::east_opt((self.input.timezone * 3600.0) as i32).unwrap()
