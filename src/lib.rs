@@ -259,7 +259,7 @@ impl SpaBuilder {
     /// Fractional second difference between UTC and UT which is used
     /// to adjust UTC for earth's irregular rotation rate and is derived
     /// from observation only and is reported in this bulletin:
-    /// http://maia.usno.navy.mil/ser7/ser7.dat,
+    /// <http://maia.usno.navy.mil/ser7/ser7.dat>,
     /// where delta_ut1 = DUT1
     /// 
     /// # Arguments
@@ -275,7 +275,7 @@ impl SpaBuilder {
     
     /// Difference between earth rotation time and terrestrial time
     /// It is derived from observation only and is reported in this
-    /// bulletin: http://maia.usno.navy.mil/ser7/ser7.dat,
+    /// bulletin: <http://maia.usno.navy.mil/ser7/ser7.dat>,
     /// where delta_t = 32.184 + (TAI-UTC) - DUT1
     /// 
     /// # Arguments
