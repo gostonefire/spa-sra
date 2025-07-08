@@ -72,10 +72,15 @@ pub struct SpaBuilder {
 }
 
 impl SpaBuilder {
-    /// Creates a new SpaBuilder with default values as of original code tests, hence an immediate
-    /// call to the [SpaBuilder::build] function with argument [Function::SpaAll] returns a fully operational
-    /// SpaData struct which when invoking the [SpaData::spa_calculate] function will calculate those
-    /// test results.
+    /// Creates a new SpaBuilder.
+    ///
+    /// All values besides a few need to be set, either using builder functions or manually via the [`Input`] struct fields
+    /// after calling [`SpaBuilder::build`], at least within valid ranges.
+    ///
+    /// These fields have quite valid defaults, at least within the neighborhood of 2025-07-10, those are:
+    /// * [`SpaBuilder::atmospheric_refraction`] / [`Input::atmos_refract`] - 0.5667 (which is a typical value)
+    /// * [`SpaBuilder::delta_ut1`] / [`Input::delta_ut1`] - 0.1 (doesn't change that often)
+    /// * [`SpaBuilder::delta_t`] / [`Input::delta_t`] - 69.084 (doesn't change that often)
     /// 
     pub fn new() -> Self {
         Self { input: Input::new() }
@@ -132,8 +137,7 @@ impl SpaBuilder {
         Ok(self)
     }
 
-    /// Sets all date and time fields to the [SpaData] struct from the given date_time
-    /// parameter.
+    /// Sets all date, time and timezone fields to the [SpaData] struct from the given date_time parameter.
     ///
     /// This method is dependent on the feature "chrono_0_4" which will include the [chrono] crate.
     ///
@@ -226,7 +230,11 @@ impl SpaBuilder {
         Ok(self)
     }
     
-    /// Sets surface slope (measured from the horizontal plane)
+    /// Sets surface slope (measured from the horizontal plane).
+    ///
+    /// This value is used to calculate the surface incidence angle for e.g. a solar panel.
+    /// The surface incidence angle is the angle between an incoming ray (like light or radar) and
+    /// a line perpendicular to the surface at the point where the ray hits.
     ///
     /// No need to set this unless [Function::SpaZaInc] or [Function::SpaAll] will be used
     /// when building.
@@ -244,7 +252,14 @@ impl SpaBuilder {
     
     /// Sets surface azimuth rotation (measured from south to projection of
     /// surface normal on horizontal plane, negative east)
-    /// 
+    ///
+    /// This value is used to calculate the surface incidence angle for e.g. a solar panel.
+    /// The surface incidence angle is the angle between an incoming ray (like light or radar) and
+    /// a line perpendicular to the surface at the point where the ray hits.
+    ///
+    /// No need to set this unless [Function::SpaZaInc] or [Function::SpaAll] will be used
+    /// when building.
+    ///
     /// # Arguments
     /// 
     /// * 'azm_rotation' - -360 to 360 degrees
